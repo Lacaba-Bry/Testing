@@ -10,6 +10,7 @@ import {
   SignOut,
   SquaresFour,
   UsersThree,
+  GearSix,
 } from "@phosphor-icons/react";
 import { NavLink } from "react-router-dom";
 import logo from "../../assets/logos/snuggles_logo.png";
@@ -26,6 +27,7 @@ const navigation = [
   { label: "Cameras", to: "/cameras", icon: Camera },
   { label: "Alerts", to: "/alerts", icon: BellRinging },
   { label: "Messages", to: "/messages", icon: ChatCircleDots },
+  { label: "Motor Test", to: "/motor-test", icon: GearSix, adminOnly: true },
   { label: "Staff", to: "/staff", icon: UsersThree, adminOnly: true },
 ];
 

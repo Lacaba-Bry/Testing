@@ -17,6 +17,7 @@ import Cameras from "./pages/Cameras";
 import Alerts from "./pages/Alerts";
 import Messages from "./pages/Messages";
 import StaffManagement from "./pages/StaffManagement";
+import MotorTest from "./pages/MotorTest";
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -50,6 +51,7 @@ export default function App() {
         <Route path="/cameras" element={<Cameras />} />
         <Route path="/alerts" element={<Alerts />} />
         <Route path="/messages" element={<Messages />} />
+        <Route path="/motor-test" element={<AdminRoute><MotorTest /></AdminRoute>} />
 
         <Route
           path="/staff"
