@@ -28,6 +28,7 @@ const navigation = [
   { label: "Alerts", to: "/alerts", icon: BellRinging },
   { label: "Messages", to: "/messages", icon: ChatCircleDots },
   { label: "Motor Test", to: "/motor-test", icon: GearSix, adminOnly: true },
+  { label: "Camera Test", to: "/camera-test", icon: Camera, adminOnly: true },
   { label: "Staff", to: "/staff", icon: UsersThree, adminOnly: true },
 ];
 
