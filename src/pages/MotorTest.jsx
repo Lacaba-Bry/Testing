@@ -74,7 +74,7 @@ export default function MotorTest() {
         {command.status === "running" && "ESP32 received the command. Rotation in progress."}
         {command.status === "completed" && "ESP32 confirmed rotation completed."}
         {command.status === "failed" && (command.error_message || "The feeder reported a failure.")}
-        {command.status === "expired" && "The ESP32 did not pick up the command within 30 seconds."}
+        {command.status === "expired" && "The ESP32 did not pick up the command before it expired."}
       </p>}
       {error && <p className="motor-test-error" role="alert">{error}</p>}
     </div>

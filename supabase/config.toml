@@ -14,3 +14,13 @@ entrypoint = "./functions/create-booking/index.js"
 enabled = true
 verify_jwt = false
 entrypoint = "./functions/motor-test/index.ts"
+
+[functions.feeder-rotate]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/feeder-rotate/index.ts"
+
+[functions.feeder-test-command]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/feeder-test-command/index.ts"
