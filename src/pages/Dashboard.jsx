@@ -20,7 +20,7 @@ import useDashboard from "../hooks/useDashboard";
 import "./Dashboard.css";
 
 export default function Dashboard() {
-  const { profile } = useAuth();
+  const { profile, isAdmin } = useAuth();
 
   const {
     boardedPets,
@@ -148,6 +148,7 @@ export default function Dashboard() {
             link="/cameras"
             linkLabel="See all cameras"
           >
+            {isAdmin && <p className="dashboard-camera-test-link"><Link to="/camera-test">Test HTTPS camera and view live stream →</Link> · <Link to="/feeder-wifi-manager">Feeder Wi-Fi Manager →</Link> · <Link to="/hardware-setup">Camera Wi-Fi Setup →</Link></p>}
             <div className="camera-status-grid">
               <CameraStatus
                 label="Online"

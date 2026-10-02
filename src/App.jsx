@@ -19,6 +19,8 @@ import Messages from "./pages/Messages";
 import StaffManagement from "./pages/StaffManagement";
 import MotorTest from "./pages/MotorTest";
 import CameraTest from "./pages/CameraTest";
+import HardwareSetup from "./pages/HardwareSetup";
+import FeederWiFiManager from "./pages/FeederWiFiManager";
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -53,7 +55,9 @@ export default function App() {
         <Route path="/alerts" element={<Alerts />} />
         <Route path="/messages" element={<Messages />} />
         <Route path="/motor-test" element={<AdminRoute><MotorTest /></AdminRoute>} />
+        <Route path="/feeder-wifi-manager" element={<AdminRoute><FeederWiFiManager /></AdminRoute>} />
         <Route path="/camera-test" element={<AdminRoute><CameraTest /></AdminRoute>} />
+        <Route path="/hardware-setup" element={<AdminRoute><HardwareSetup /></AdminRoute>} />
 
         <Route
           path="/staff"

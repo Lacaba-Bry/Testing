@@ -2,3 +2,5 @@
 
 /* Readability refresh */
 .carefur-dashboard{max-width:1420px}.dashboard-greeting{font-size:.9rem}.dashboard-subtitle{font-size:.95rem}.summary-item span{font-size:.82rem}.dashboard-section__header h2{font-size:1.05rem}.dashboard-section__link{font-size:.82rem}.feeding-item__details p{font-size:.86rem}.feeding-item__details small{font-size:.74rem}.feeding-badge{font-size:.72rem}.alert-item__top h3{font-size:.91rem}.alert-item__top time{font-size:.72rem}.alert-item__content p{font-size:.8rem}.camera-status div{font-size:.82rem}.activity-item p{font-size:.84rem}.activity-item small{font-size:.73rem}
+
+.dashboard-camera-test-link{margin-bottom:12px;font-size:.85rem;font-weight:750}.dashboard-camera-test-link a{color:var(--carefur-green)}

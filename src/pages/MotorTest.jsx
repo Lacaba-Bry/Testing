@@ -57,7 +57,7 @@ export default function MotorTest() {
 
   const pending = busy || ["queued", "running"].includes(command?.status);
   return <section className="motor-test-page">
-    <PageHeader eyebrow="Hardware" title="Motor Test" description="Send one 120° rotation to your configured feeder and wait for its confirmation." />
+    <PageHeader eyebrow="Hardware" title="Feeder ESP32" description="Send one 120° rotation to your configured feeder and wait for its confirmation." />
     <div className="motor-test-card">
       <div className="motor-test-icon"><GearSix size={32} /></div>
       <label htmlFor="motor-device">Feeder device</label>

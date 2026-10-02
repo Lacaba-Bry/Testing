@@ -11,8 +11,12 @@ import {
   SquaresFour,
   UsersThree,
   GearSix,
+  WifiHigh,
+  CaretDown,
+  Circuitry,
 } from "@phosphor-icons/react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
+import { useState } from "react";
 import logo from "../../assets/logos/snuggles_logo.png";
 import useAuth from "../../hooks/useAuth";
 import "./Sidebar.css";
@@ -27,12 +31,20 @@ const navigation = [
   { label: "Cameras", to: "/cameras", icon: Camera },
   { label: "Alerts", to: "/alerts", icon: BellRinging },
   { label: "Messages", to: "/messages", icon: ChatCircleDots },
-  { label: "Motor Test", to: "/motor-test", icon: GearSix, adminOnly: true },
-  { label: "Camera Test", to: "/camera-test", icon: Camera, adminOnly: true },
   { label: "Staff", to: "/staff", icon: UsersThree, adminOnly: true },
 ];
 
+const hardwareItems = [
+  { label: "Feeder ESP32", to: "/motor-test", icon: GearSix },
+  { label: "Feeder Wi-Fi Manager", to: "/feeder-wifi-manager", icon: WifiHigh },
+  { label: "Camera Test", to: "/camera-test", icon: Camera },
+  { label: "Camera Wi-Fi Setup", to: "/hardware-setup", icon: WifiHigh },
+];
+
 export default function Sidebar({ isOpen, onClose }) {
+  const location = useLocation();
+  const hardwareIsActive = location.pathname === "/hardware-monitoring" || hardwareItems.some((item) => location.pathname === item.to);
+  const [hardwareExpanded, setHardwareExpanded] = useState(hardwareIsActive);
   const { logout, profile, isAdmin } = useAuth();
 
   async function handleLogout() {
@@ -54,6 +66,21 @@ export default function Sidebar({ isOpen, onClose }) {
           const Icon = item.icon;
           return <NavLink key={item.to} to={item.to} onClick={onClose} className={({ isActive }) => `sidebar-link ${isActive ? "sidebar-link-active" : ""}`}><Icon size={20} weight="duotone" /><span>{item.label}</span></NavLink>;
         })}
+        {isAdmin && (
+          <div className="sidebar-hardware-group">
+            <button type="button" className={`sidebar-link sidebar-hardware-toggle ${hardwareIsActive ? "sidebar-hardware-active" : ""}`} onClick={() => setHardwareExpanded((open) => !open)} aria-expanded={hardwareExpanded} aria-controls="sidebar-hardware-links">
+              <Circuitry size={20} weight="duotone" /><span>Hardware Monitoring</span><CaretDown size={17} className={`sidebar-hardware-caret ${hardwareExpanded ? "sidebar-hardware-caret-open" : ""}`} />
+            </button>
+            {hardwareExpanded && (
+              <div id="sidebar-hardware-links" className="sidebar-hardware-links">
+                {hardwareItems.map((item) => {
+                  const Icon = item.icon;
+                  return <NavLink key={item.to} to={item.to} onClick={onClose} className={({ isActive }) => `sidebar-link sidebar-hardware-child ${isActive ? "sidebar-link-active" : ""}`}><Icon size={18} weight="duotone" /><span>{item.label}</span></NavLink>;
+                })}
+              </div>
+            )}
+          </div>
+        )}
       </nav>
 
       <div className="sidebar-account">

@@ -1,3 +1,7 @@
+import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { CAMERA_GATEWAY_URL, checkCameraGateway } from "../services/cameraGateway";
+import useAuth from "../hooks/useAuth";
 import { ArrowClockwise, Camera, Clock, House, WifiHigh, WifiSlash } from "@phosphor-icons/react";
 import Badge from "../components/common/Badge";
 import Button from "../components/common/Button";
@@ -8,6 +12,17 @@ import "./Cameras.css";
 
 export default function Cameras() {
   const { cameras, loading, error, refresh } = useCameras();
+  const { isAdmin } = useAuth();
+  const [gatewayStatus, setGatewayStatus] = useState("checking");
+  useEffect(() => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
+    checkCameraGateway(CAMERA_GATEWAY_URL, controller.signal)
+      .then(() => setGatewayStatus("online"))
+      .catch(() => setGatewayStatus("unavailable"))
+      .finally(() => clearTimeout(timer));
+    return () => { clearTimeout(timer); controller.abort(); };
+  }, []);
   const online = cameras.filter((item) => item.online).length;
 
   return (
@@ -19,6 +34,10 @@ export default function Cameras() {
         actions={<Button variant="secondary" onClick={refresh}><ArrowClockwise size={18} /> Refresh</Button>}
       />
 
+      {isAdmin && <div className="camera-gateway-panel">
+        <div><strong>CareFur ESP32-CAM · HTTPS gateway</strong><p>Gateway: {CAMERA_GATEWAY_URL}</p><p>Live gateway check: {gatewayStatus === "online" ? "Online" : gatewayStatus === "checking" ? "Checking…" : "Unavailable"}. This check is separate from Supabase device heartbeats.</p></div>
+        <Link to="/camera-test">Open Camera Test &amp; Live Preview</Link>
+      </div>}
       <div className="camera-summary">
         <Summary icon={WifiHigh} value={online} label="Online" tone="success" />
         <Summary icon={WifiSlash} value={Math.max(cameras.length - online, 0)} label="Offline" tone="danger" />
@@ -27,7 +46,7 @@ export default function Cameras() {
 
       <div className="camera-info-note">
         <Camera size={20} />
-        <div><strong>Live video source</strong><p>Your current Supabase schema stores camera devices and status, but it does not include a stream URL. This page therefore monitors availability and assignments. Add a secure stream field or camera gateway endpoint when your ESP32-CAM stream is ready.</p></div>
+        <div><strong>Live video source</strong><p>Database camera counts use Supabase device heartbeats. The separate HTTPS gateway test above checks the ESP32-CAM directly; it does not change database counts.</p></div>
       </div>
 
       {error && <div className="page-alert page-alert--error">{error}</div>}

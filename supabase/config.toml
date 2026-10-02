@@ -24,3 +24,8 @@ entrypoint = "./functions/feeder-rotate/index.ts"
 enabled = true
 verify_jwt = false
 entrypoint = "./functions/feeder-test-command/index.ts"
+
+[functions.feeder-wifi-status]
+enabled = true
+verify_jwt = false # Device uses its own x-device-secret; admin read verifies JWT in code.
+entrypoint = "./functions/feeder-wifi-status/index.ts"
