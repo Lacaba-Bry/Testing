@@ -1,0 +1,241 @@
+.rooms-page {
+  display: block;
+}
+
+.rooms-filter-bar {
+  margin: 8px 0 16px;
+}
+
+.rooms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 16px;
+}
+
+.room-panel {
+  background: white;
+  border: 1px solid var(--carefur-border);
+  border-radius: 22px;
+  padding: 18px;
+  box-shadow: 0 12px 30px rgba(14, 64, 63, 0.05);
+  display: grid;
+  gap: 14px;
+}
+
+.room-panel--maintenance {
+  border-color: #ead7a9;
+}
+
+.room-panel--inactive {
+  border-color: #dbe2de;
+}
+
+.room-panel__header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.room-number {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: var(--carefur-green-soft);
+  color: var(--carefur-green);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.room-panel__name {
+  min-width: 0;
+  flex: 1;
+}
+
+.room-panel__name h2 {
+  font-size: 1.08rem;
+}
+
+.room-panel__name p {
+  color: var(--carefur-muted);
+  font-size: 0.84rem;
+  margin-top: 3px;
+}
+
+.room-panel__badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.room-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.room-badge--occupied {
+  background: #e8f1fb;
+  color: #1d5f8b;
+}
+
+.room-capacity {
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: #f8fbf9;
+  border: 1px solid #e5eeea;
+  color: var(--carefur-muted);
+  font-size: 0.88rem;
+}
+
+.room-capacity strong {
+  color: var(--carefur-text);
+  margin-left: 3px;
+}
+
+.cf-room-pet {
+  min-height: 48px;
+  color: var(--carefur-text);
+  line-height: 1.55;
+}
+
+.cf-room-pet strong,
+.cf-room-pet span {
+  display: block;
+}
+
+.cf-room-pet span {
+  color: var(--carefur-muted);
+  font-size: 0.86rem;
+  margin-top: 3px;
+}
+
+.cf-room-reason {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--carefur-warning);
+  background: var(--carefur-warning-bg);
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+}
+
+.cf-room-health {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.cf-room-health span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 34px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: #f6f8f7;
+  border: 1px solid #e4ebe7;
+  font-size: 0.82rem;
+}
+
+.cf-room-actions {
+  padding-top: 4px;
+}
+
+.room-manage-modal {
+  width: min(620px, 100%);
+}
+
+.room-manage-modal__header {
+  padding: 22px 24px 10px;
+}
+
+.room-manage-modal__header h2 {
+  margin-bottom: 5px;
+}
+
+.room-manage-modal__header p {
+  color: var(--carefur-muted);
+}
+
+.room-manage-modal__body {
+  padding: 8px 24px 0;
+  display: grid;
+  gap: 14px;
+}
+
+.room-manage-modal__body label {
+  display: grid;
+  gap: 7px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.room-manage-modal__body input,
+.room-manage-modal__body select {
+  min-height: 44px;
+  border: 1px solid var(--carefur-border);
+  border-radius: 12px;
+  background: white;
+  padding: 0 12px;
+}
+
+.cf-upcoming-confirm {
+  border: 1px solid #ecdcc0;
+  background: #fffaf1;
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.cf-upcoming-confirm strong {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.cf-upcoming-confirm ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--carefur-text);
+}
+
+.cf-upcoming-confirm li {
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.cf-confirm-check {
+  display: flex !important;
+  align-items: flex-start;
+  gap: 10px;
+  margin-top: 10px;
+  font-weight: 600 !important;
+}
+
+.cf-confirm-check input {
+  min-height: auto;
+  margin-top: 4px;
+}
+
+@media (max-width: 640px) {
+  .rooms-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .room-manage-modal__header,
+  .room-manage-modal__body {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+}
+
+/* Hardware chips: prevent global status-dot rules from stretching the dot */
+.cf-room-health>span{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;min-height:34px;color:#254e4b}
+.cf-room-health>span>svg{width:16px;height:16px;flex:none;color:#23675e}
+.cf-room-health .cf-device-dot{display:inline-block!important;min-width:7px!important;width:7px!important;height:7px!important;min-height:7px!important;max-height:7px!important;padding:0!important;flex:0 0 7px!important;border-radius:50%!important;background:#a0aaa5!important;border:0!important}
+.cf-room-health .cf-device-dot.is-active{background:#23804a!important}

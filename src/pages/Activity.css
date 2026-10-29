@@ -1,0 +1,7 @@
+.cf-activity-page { display:grid; gap:16px; }
+.cf-activity-list { position:relative; display:grid; gap:0; }
+.cf-activity-entry { display:grid; grid-template-columns:12px 1fr auto; gap:12px; align-items:start; padding:14px 8px; border-bottom:1px solid #e2e9e6; }
+.cf-activity-entry__dot { width:9px; height:9px; border-radius:50%; background:var(--carefur-green); margin-top:6px; box-shadow:0 0 0 4px var(--carefur-green-soft); }
+.cf-activity-entry strong { font-size:14px; font-weight:600; }
+.cf-activity-entry p { margin:5px 0 0; color:var(--carefur-muted); font-size:13px; }
+.cf-activity-entry > span:last-child { color:var(--carefur-muted); font-size:13px; }

@@ -1,0 +1,9 @@
+.motor-test-card{max-width:570px;background:#fff;border:1px solid var(--carefur-border);border-radius:20px;padding:28px;display:grid;gap:15px;box-shadow:0 10px 28px rgba(20,63,61,.045)}
+.motor-test-icon{width:58px;height:58px;border-radius:16px;display:grid;place-items:center;background:var(--carefur-cream-soft);color:var(--carefur-green)}
+.motor-test-card label{font-weight:750;color:var(--carefur-green-dark)}
+.motor-test-card select{width:100%;padding:12px;border:1px solid var(--carefur-border);border-radius:10px;background:#fff;font:inherit}
+.motor-test-note{color:var(--carefur-muted);font-size:.88rem;line-height:1.5}
+.motor-test-button{display:flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:11px;padding:13px 18px;background:var(--carefur-green);color:#fff;font:inherit;font-weight:800;cursor:pointer}
+.motor-test-button:disabled{opacity:.55;cursor:not-allowed}
+.motor-test-status,.motor-test-error{padding:12px;border-radius:10px;background:var(--carefur-cream-soft);font-size:.9rem}
+.motor-test-status--completed{background:#e6f5ec;color:#17623d}.motor-test-status--failed,.motor-test-status--expired,.motor-test-error{background:#fff0ed;color:#9b3022}

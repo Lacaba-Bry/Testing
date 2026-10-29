@@ -1,0 +1,174 @@
+.boardings-page {
+  display: block;
+}
+
+.boardings-toolbar {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.boardings-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--carefur-border);
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 10px 24px rgba(20, 63, 61, 0.04);
+}
+
+.boardings-search input {
+  border: 0;
+  outline: 0;
+  background: transparent;
+  width: 100%;
+}
+
+.boardings-filters {
+  overflow: auto;
+}
+
+.boardings-new-link {
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 13px;
+  background: var(--carefur-green);
+  color: white;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.boardings-table-wrap {
+  overflow: auto;
+  border: 1px solid var(--carefur-border);
+  border-radius: 18px;
+  background: white;
+  box-shadow: 0 14px 30px rgba(20, 63, 61, 0.05);
+}
+
+.boardings-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 920px;
+}
+
+.boardings-table th,
+.boardings-table td {
+  padding: 14px;
+  border-bottom: 1px solid #e7eeea;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.boardings-table th {
+  background: var(--carefur-cream-soft);
+  color: var(--carefur-green-dark);
+}
+
+.boardings-table td strong,
+.boardings-table td small {
+  display: block;
+}
+
+.boardings-table td small {
+  margin-top: 4px;
+  color: var(--carefur-muted);
+  font-size: 0.82rem;
+}
+
+.boardings-mobile {
+  display: none;
+}
+
+.cf-mobile-stay {
+  background: white;
+  border: 1px solid var(--carefur-border);
+  border-radius: 18px;
+  padding: 15px;
+  display: grid;
+  gap: 6px;
+}
+
+.cf-mobile-stay span,
+.cf-mobile-stay p {
+  color: var(--carefur-muted);
+}
+
+.cf-export-modal {
+  width: min(760px, 100%);
+  padding: 22px;
+  display: grid;
+  gap: 14px;
+}
+
+.cf-export-modal h2 {
+  margin: 0 0 2px;
+}
+
+.cf-export-modal label,
+.cf-export-modal legend {
+  display: grid;
+  gap: 7px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.cf-export-modal input,
+.cf-export-modal select {
+  min-height: 44px;
+  border: 1px solid var(--carefur-border);
+  border-radius: 12px;
+  padding: 0 12px;
+}
+
+.cf-export-dates {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.cf-export-modal fieldset {
+  border: 1px solid var(--carefur-border);
+  border-radius: 14px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 14px;
+}
+
+.cf-export-column {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600 !important;
+}
+
+.cf-export-column input {
+  min-height: auto;
+}
+
+@media (max-width: 800px) {
+  .boardings-table-wrap {
+    display: none;
+  }
+
+  .boardings-mobile {
+    display: grid;
+    gap: 12px;
+  }
+
+  .cf-export-dates,
+  .cf-export-modal fieldset {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Staff-only boarding lifecycle controls. */
+.boardings-staff-actions { display: flex; flex-wrap: wrap; gap: 8px; min-width: 240px; }
+.boardings-staff-actions button { white-space: nowrap; }
