@@ -11,9 +11,6 @@ import Dashboard from "./pages/Dashboard";
 import Activity from "./pages/Activity";
 import NewBoarding from "./pages/NewBoarding";
 import Boardings from "./pages/Boardings";
-import Extensions from "./pages/Extensions";
-import BoardingReviews from "./pages/BoardingReviews";
-import ReservationRequests from "./pages/ReservationRequests";
 import Pets from "./pages/Pets";
 import Rooms from "./pages/Rooms";
 import FeedingSchedule from "./pages/FeedingSchedule";
@@ -55,9 +52,6 @@ export default function App() {
         <Route path="/activity" element={<Activity />} />
         <Route path="/boarding/new" element={<NewBoarding />} />
         <Route path="/boardings" element={<Boardings />} />
-        <Route path="/extensions" element={<Extensions />} />
-        <Route path="/boarding-reviews" element={<BoardingReviews />} />
-        <Route path="/reservation-requests" element={<ReservationRequests />} />
         <Route path="/pets" element={<Pets />} />
         <Route path="/rooms" element={<Rooms />} />
         <Route path="/feeding-schedules" element={<FeedingSchedule />} />

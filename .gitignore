@@ -30,9 +30,3 @@ dist-ssr
 
 # Local Supabase CLI state
 supabase/.temp/
-node_modules/
-dist/
-.env
-.env.*
-!.env.example
-supabase/.temp/

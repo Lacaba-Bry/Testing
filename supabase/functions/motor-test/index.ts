@@ -158,6 +158,10 @@ Deno.serve(async (req: Request) => {
   }
 
   if (action === "queue") {
+    const commandType = body.command_type === undefined ? "rotate" : body.command_type;
+    if (commandType !== "rotate" && commandType !== "home") {
+      return jsonResponse(req, { error: "Invalid motor command type" }, 400);
+    }
     // Clear stale pending commands so a dead browser session cannot block testing.
     const cutoff = new Date(Date.now() - COMMAND_EXPIRATION_MS).toISOString();
     const { error: expireError } = await db
@@ -196,12 +200,15 @@ Deno.serve(async (req: Request) => {
       .from("feeder_test_commands")
       .insert({
         device_code: device.device_code,
+        // HOME uses legacy-compatible placeholders. The ESP32 ignores these
+        // for homing, using its switch-based routine and safety timeouts.
         steps: TEST_STEPS,
         direction: TEST_DIRECTION,
+        command_type: commandType,
         status: "pending",
         requested_by: authData.user.id,
       })
-      .select("id, device_code, steps, direction, status, created_at")
+      .select("id, device_code, steps, direction, command_type, status, created_at")
       .single();
 
     if (insertError || !command) {
@@ -238,7 +245,7 @@ Deno.serve(async (req: Request) => {
     const { data: command, error: commandError } = await db
       .from("feeder_test_commands")
       .select(
-        "id, device_code, steps, direction, status, created_at, claimed_at, completed_at",
+        "id, device_code, steps, direction, command_type, status, created_at, claimed_at, completed_at",
       )
       .eq("id", commandId)
       .eq("device_code", device.device_code)

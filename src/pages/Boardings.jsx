@@ -1,5 +1,5 @@
 import { ArrowClockwise, CalendarBlank, DownloadSimple, MagnifyingGlass, Plus } from "@phosphor-icons/react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
 import { supabase } from "../services/supabaseClient";
@@ -43,8 +43,6 @@ export default function Boardings() {
   const [exportColumns, setExportColumns] = useState(EXPORT_COLUMNS);
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState("");
-  const [actionBusy, setActionBusy] = useState(null);
-  const [actionError, setActionError] = useState("");
 
   const filtered = useMemo(() => {
     const needle = search.trim().toLowerCase();
@@ -65,48 +63,6 @@ export default function Boardings() {
   const pageCount = Math.max(1, Math.ceil(filtered.length / 25));
   const currentPage = Math.min(page, pageCount);
   const paged = filtered.slice((currentPage - 1) * 25, currentPage * 25);
-
-  async function updateBooking(booking, action) {
-    const isCheckIn = action === "check_in";
-    const durationMs = new Date(booking.expected_check_out_at) - new Date(booking.check_in_at);
-    if (isCheckIn && !(durationMs > 0)) {
-      setActionError("This booking has an invalid duration. Correct its scheduled dates first.");
-      return;
-    }
-    const durationHours = Math.round(durationMs / 3600000);
-    const prompt = isCheckIn
-      ? `Check in ${booking.pet?.name || "this pet"} now? The original stay duration (${durationHours} hours) will be preserved and checkout recalculated from the actual check-in time. This activates the booking.`
-      : `CANCEL booking ${booking.booking_code}? This cannot be undone from this page. It expires the boarding access codes immediately. The camera gateway must also enforce cancellation.`;
-    if (!window.confirm(prompt)) return;
-    setActionBusy(booking.id);
-    setActionError("");
-    try {
-      const { error: e } = await supabase.rpc("carefur_staff_boarding_action", {
-        p_booking_id: booking.id,
-        p_action: action,
-      });
-      if (e) throw e;
-      await refresh();
-    } catch (e) {
-      setActionError(e?.message || "Unable to update boarding. Please retry.");
-    } finally {
-      setActionBusy(null);
-    }
-  }
-
-  function bookingActions(item) {
-    if (item.status !== "pending" || !isAdmin) return null;
-    return (
-      <div className="boardings-staff-actions">
-        <Button disabled={actionBusy !== null} onClick={() => updateBooking(item, "check_in")}>
-          {actionBusy === item.id ? "Processing…" : "Early Check-In"}
-        </Button>
-        <Button variant="secondary" disabled={actionBusy !== null} onClick={() => updateBooking(item, "cancel")}>
-          Cancel Booking
-        </Button>
-      </div>
-    );
-  }
 
   async function runExport() {
     setExporting(true);
@@ -267,7 +223,7 @@ export default function Boardings() {
       </div>
 
       {error && <div className="page-alert page-alert--error">{error}</div>}
-      {actionError && <div role="alert" className="page-alert page-alert--error">{actionError}</div>}
+
       {loading ? (
         <div className="page-loading">Loading boardings…</div>
       ) : filtered.length === 0 ? (
@@ -285,7 +241,6 @@ export default function Boardings() {
                   <th>Check-in</th>
                   <th>Check-out</th>
                   <th>Status</th>
-                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -306,7 +261,6 @@ export default function Boardings() {
                     <td>
                       <Badge tone={toneForStatus(item.status)}>{formatStatus(item.status)}</Badge>
                     </td>
-                    <td>{bookingActions(item)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -326,7 +280,6 @@ export default function Boardings() {
                 <p>
                   {formatDateTime(item.check_in_at)} – {formatDateTime(item.expected_check_out_at)}
                 </p>
-                {bookingActions(item)}
               </article>
             ))}
           </div>
