@@ -3,6 +3,8 @@ import { ArrowClockwise, GearSix } from "@phosphor-icons/react";
 import PageHeader from "../components/common/PageHeader";
 import { supabase } from "../services/supabaseClient";
 import "./MotorTest.css";
+import FeederFoodMonitor from "../components/FeederFoodMonitor";
+import FeederScheduleTester from "../components/FeederScheduleTester";
 
 async function invoke(body) {
   const { data, error } = await supabase.functions.invoke("motor-test", { body });
@@ -46,18 +48,19 @@ export default function MotorTest() {
     return () => { active = false; clearInterval(timer); };
   }, [command?.id, command?.status, deviceId]);
 
-  async function rotate() {
+  async function queueMotorCommand(commandType) {
     setError(""); setBusy(true); setCommand(null);
     try {
-      const result = await invoke({ action: "queue", device_id: deviceId });
+      const result = await invoke({ action: "queue", device_id: deviceId, command_type: commandType });
       setCommand(result.command);
     } catch (requestError) { setError(requestError.message); }
     finally { setBusy(false); }
   }
 
+  const selectedFeeder = feeders.find((item) => item.id === deviceId);
   const pending = busy || ["queued", "running"].includes(command?.status);
   return <section className="motor-test-page">
-    <PageHeader eyebrow="Hardware" title="Feeder ESP32" description="Send one 120° rotation to your configured feeder and wait for its confirmation." />
+    <PageHeader eyebrow="Hardware" title="Feeder ESP32" description="Rotate one compartment or return to the limit-switch home position." />
     <div className="motor-test-card">
       <div className="motor-test-icon"><GearSix size={32} /></div>
       <label htmlFor="motor-device">Feeder device</label>
@@ -65,18 +68,25 @@ export default function MotorTest() {
         {feeders.length === 0 && <option value="">No active feeders registered</option>}
         {feeders.map((feeder) => <option value={feeder.id} key={feeder.id}>{feeder.device_name || feeder.device_code} ({feeder.device_code})</option>)}
       </select>
-      <p className="motor-test-note">Ensure the tray is clear before starting. This test advances one compartment (533 steps).</p>
-      <button type="button" className="motor-test-button" disabled={!deviceId || pending} onClick={rotate}>
-        <ArrowClockwise size={20} /> {pending ? "Waiting for feeder…" : "Rotate 120°"}
-      </button>
+      <p className="motor-test-note">Check the mechanism is clear before moving. Home rotates counterclockwise until GPIO27 detects the switch, then continues for 450 ms. Homing stops on its existing step/time limits if the switch fails.</p>
+      <div className="motor-test-actions">
+        <button type="button" className="motor-test-button" disabled={!deviceId || pending} onClick={() => queueMotorCommand("rotate")}>
+          <ArrowClockwise size={20} /> Rotate 120°
+        </button>
+        <button type="button" className="motor-test-button motor-test-button--home" disabled={!deviceId || pending} onClick={() => queueMotorCommand("home")}>
+          <GearSix size={20} /> Home Position
+        </button>
+      </div>
       {command && <p className={`motor-test-status motor-test-status--${command.status}`} role="status">
         {command.status === "queued" && "Queued. Waiting for the ESP32 to poll."}
-        {command.status === "running" && "ESP32 received the command. Rotation in progress."}
-        {command.status === "completed" && "ESP32 confirmed rotation completed."}
+        {command.status === "running" && (command.command_type === "home" ? "ESP32 is searching for the home switch." : "ESP32 received the command. Rotation in progress.")}
+        {command.status === "completed" && (command.command_type === "home" ? "ESP32 confirmed homing completed." : "ESP32 confirmed rotation completed.")}
         {command.status === "failed" && (command.error_message || "The feeder reported a failure.")}
         {command.status === "expired" && "The ESP32 did not pick up the command before it expired."}
       </p>}
       {error && <p className="motor-test-error" role="alert">{error}</p>}
     </div>
+    {selectedFeeder && <FeederFoodMonitor deviceCode={selectedFeeder.device_code} />}
+    {selectedFeeder && <FeederScheduleTester deviceId={selectedFeeder.id} />}
   </section>;
 }

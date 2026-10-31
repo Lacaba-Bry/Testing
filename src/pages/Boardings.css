@@ -168,7 +168,3 @@
     grid-template-columns: 1fr;
   }
 }
-
-/* Staff-only boarding lifecycle controls. */
-.boardings-staff-actions { display: flex; flex-wrap: wrap; gap: 8px; min-width: 240px; }
-.boardings-staff-actions button { white-space: nowrap; }

@@ -221,7 +221,7 @@ async function handleClaim() {
   } = await db
     .from("feeder_test_commands")
     .select(
-      "id, device_code, steps, direction, status, created_at"
+      "id, device_code, steps, direction, command_type, status, created_at"
     )
     .eq("device_code", DEVICE_CODE)
     .eq("status", "pending")
@@ -308,7 +308,7 @@ async function handleClaim() {
     .eq("status", "pending")
     .gte("created_at", cutoff)
     .select(
-      "id, device_code, steps, direction, status"
+      "id, device_code, steps, direction, command_type, status"
     )
     .maybeSingle();
 
@@ -353,6 +353,7 @@ async function handleClaim() {
     device_code: claimed.device_code,
     steps: claimed.steps,
     direction: claimed.direction,
+    command_type: claimed.command_type ?? "rotate",
     status: "claimed"
   });
 }

@@ -88,20 +88,20 @@ export default function useOwnerSearch() {
       }
 
       /*
-       * Merge matches by normalized email instead of database ID.
-       * Prefer a name match when the same email occurs more than once.
-       * This hides duplicate owner rows in search results, but the
-       * database must also enforce uniqueness to prevent new duplicates.
+       * An owner may match more than one field, so merge the
+       * results and remove duplicates using the owner's ID.
        */
       const uniqueOwners = new Map();
+
       for (const result of results) {
         for (const owner of result.data ?? []) {
-          const email = String(owner.email ?? "").trim().toLowerCase();
-          const key = email || `id:${owner.id}`;
-          if (!uniqueOwners.has(key)) uniqueOwners.set(key, owner);
+          uniqueOwners.set(owner.id, owner);
         }
       }
-      setOwners(Array.from(uniqueOwners.values()).slice(0, 5));
+
+      setOwners(
+        Array.from(uniqueOwners.values()).slice(0, 5),
+      );
     } catch (searchError) {
       if (requestId !== latestRequestId.current) {
         return;
