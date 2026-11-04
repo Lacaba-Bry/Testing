@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ArrowClockwise, ArrowSquareOut, Camera, CheckCircle, Image as ImageIcon, Play, Stop, WarningCircle, WifiSlash } from "@phosphor-icons/react";
 import PageHeader from "../components/common/PageHeader";
-import { CAMERA_GATEWAY_URL, cameraEndpoint, checkCameraGateway, authenticatedSnapshot, consumeAuthenticatedMJPEG } from "../services/cameraGateway";
+import { CAMERA_GATEWAY_URL, cameraEndpoint, checkCameraGateway, authenticatedSnapshot, consumeAuthenticatedMJPEG, consumeAuthenticatedWebSocket } from "../services/cameraGateway";
 import "./CameraTest.css";
 
 const TEST_TIMEOUT_MS = 15000;
@@ -111,7 +111,7 @@ export default function CameraTest() {
     const controller = new AbortController(); streamControllerRef.current = controller;
     streamStartRef.current = Date.now();
     try {
-      await consumeAuthenticatedMJPEG(base, controller.signal, (url) => {
+      await consumeAuthenticatedWebSocket(base, controller.signal, (url) => {
         if (controller.signal.aborted || !mountedRef.current) { URL.revokeObjectURL(url); return; }
         if (frameUrlRef.current) URL.revokeObjectURL(frameUrlRef.current);
         frameUrlRef.current = url;
@@ -131,7 +131,7 @@ export default function CameraTest() {
       <PageHeader eyebrow="Hardware Monitoring" title="Camera Test" description="Watch frames uploaded through Cloudflare, even when your ESP32-CAM is on another Wi-Fi network." />
       <div className="camera-test-layout">
         <div className="camera-test-card">
-          <div className="camera-test-card__heading"><div className="camera-test-icon"><Camera size={30} weight="duotone" /></div><div><h2>CareFur internet camera gateway</h2><p>Camera pushes JPEG frames to your laptop. Only signed-in administrators may view them.</p></div></div>
+          <div className="camera-test-card__heading"><div className="camera-test-icon"><Camera size={30} weight="duotone" /></div><div><h2>CareFur internet camera gateway</h2><p>Camera sends frames to the VPS. Only signed-in administrators may view them.</p></div></div>
           <label htmlFor="camera-url">HTTPS gateway URL</label>
           <div className="camera-url-row"><input id="camera-url" value={inputUrl} onChange={(e) => setInputUrl(e.target.value)} placeholder="https://camera.apicarefur.me" spellCheck={false}/><button className="camera-test-secondary" type="button" onClick={() => window.open(base, "_blank", "noopener,noreferrer")} disabled={!base}><ArrowSquareOut size={18}/> Open</button></div>
           <div className={`camera-test-status camera-test-status--${status}`} role="status">
@@ -140,12 +140,12 @@ export default function CameraTest() {
           </div>
           {mixed && <div className="camera-test-warning"><WarningCircle size={20}/><p>Use HTTPS for your public CareFur gateway.</p></div>}
           <div className="camera-test-actions"><button className="camera-test-primary" type="button" onClick={testCamera} disabled={status === "testing" || !base || mixed}><ArrowClockwise size={19}/> {status === "testing" ? "Testing…" : "Test Camera"}</button><button className="camera-test-secondary" type="button" disabled={!base || mixed} onClick={takeSnapshot}><ImageIcon size={18}/> Snapshot</button></div>
-          <dl className="camera-test-details"><div><dt>Health</dt><dd>{base ? cameraEndpoint("health", base) : "—"}</dd></div><div><dt>Capture</dt><dd>{base ? cameraEndpoint("capture", base) : "—"}</dd></div><div><dt>Stream</dt><dd>{base ? cameraEndpoint("stream", base) : "—"}</dd></div><div><dt>Test time</dt><dd>{latency !== null ? `${latency} ms` : "—"}</dd></div><div><dt>Image</dt><dd>{dimensions || "—"}</dd></div></dl>
+          <dl className="camera-test-details"><div><dt>Health</dt><dd>{base ? cameraEndpoint("health", base) : "—"}</dd></div><div><dt>Capture</dt><dd>{base ? cameraEndpoint("capture", base) : "—"}</dd></div><div><dt>Stream</dt><dd>{base ? cameraEndpoint("ws/viewer", base).replace(/^http/, "ws") : "—"}</dd></div><div><dt>Test time</dt><dd>{latency !== null ? `${latency} ms` : "—"}</dd></div><div><dt>Image</dt><dd>{dimensions || "—"}</dd></div></dl>
         </div>
         <div className="camera-preview-card">
-          <div className="camera-preview-card__heading"><div><span>Authenticated live preview</span><h2>CareFur ESP32-CAM</h2></div><div className="camera-preview-actions">{streaming ? <button type="button" onClick={stopStream}><Stop size={17} weight="fill"/> Stop Stream</button> : <button type="button" disabled={!base || mixed} onClick={startStream}><Play size={17} weight="fill"/> Start Stream</button>}</div></div>
+          <div className="camera-preview-card__heading"><div><span>Authenticated WebSocket preview</span><h2>CareFur ESP32-CAM</h2></div><div className="camera-preview-actions">{streaming ? <button type="button" onClick={stopStream}><Stop size={17} weight="fill"/> Stop Stream</button> : <button type="button" disabled={!base || mixed} onClick={startStream}><Play size={17} weight="fill"/> Start Stream</button>}</div></div>
           <div className="camera-live-frame">
-            {streaming && streamFrame ? <img src={streamFrame} alt="Live ESP32-CAM stream"/> : !streaming && snapshot ? <img src={snapshot} alt="Authenticated camera snapshot"/> : <div className="camera-live-placeholder"><Camera size={52} weight="duotone"/><strong>No camera preview yet</strong><span>Run Camera Test or Start Stream.</span></div>}
+            {streaming && streamFrame ? <img className="carefur-camera-feed" src={streamFrame} alt="Live ESP32-CAM stream"/> : !streaming && snapshot ? <img className="carefur-camera-feed" src={snapshot} alt="Authenticated camera snapshot"/> : <div className="camera-live-placeholder"><Camera size={52} weight="duotone"/><strong>No camera preview yet</strong><span>Run Camera Test or Start Stream.</span></div>}
             {streaming && !streamLoaded && !streamError && <div className="camera-stream-hint">Authenticating and receiving frames…</div>}
             {streamError && <div className="camera-stream-error"><WifiSlash size={28}/><strong>Stream interrupted</strong><span>{streamError}</span></div>}
             {streaming && streamLoaded && <div className="camera-stream-hint">LIVE · {streamFrames} frames received</div>}

@@ -92,3 +92,62 @@ export async function consumeAuthenticatedMJPEG(base, signal, onFrame) {
     reader.releaseLock();
   }
 }
+
+// Authenticated WebSocket preview: keep the bearer token out of URLs and logs.
+// Browser WebSocket API does not support Authorization headers, so send the
+// Supabase token as the first message over the encrypted WSS connection.
+export async function consumeAuthenticatedWebSocket(base, signal, onFrame, onStatus = () => {}) {
+  const { Authorization } = await authHeaders();
+  if (signal.aborted) return;
+  const wsUrl = new URL(cameraEndpoint("ws/viewer", base));
+  wsUrl.protocol = wsUrl.protocol === "https:" ? "wss:" : "ws:";
+  return new Promise((resolve, reject) => {
+    const socket = new WebSocket(wsUrl.toString());
+    socket.binaryType = "blob";
+    let authenticated = false;
+    let finished = false;
+    let authTimer;
+    const cleanup = () => {
+      clearTimeout(authTimer);
+      signal.removeEventListener("abort", abort);
+    };
+    const finish = (error) => {
+      if (finished) return;
+      finished = true;
+      cleanup();
+      if (error) reject(error); else resolve();
+    };
+    const abort = () => { socket.close(1000, "Viewer stopped"); finish(); };
+    signal.addEventListener("abort", abort, { once: true });
+    authTimer = setTimeout(() => { socket.close(); finish(new Error("WebSocket authentication timed out.")); }, 12000);
+    socket.onopen = () => {
+      if (signal.aborted) return abort();
+      socket.send(JSON.stringify({ type: "auth", token: Authorization.slice(7) }));
+    };
+    socket.onmessage = (event) => {
+      if (signal.aborted) return;
+      if (typeof event.data === "string") {
+        try {
+          const msg = JSON.parse(event.data);
+          if (msg.type === "ready") {
+            authenticated = true;
+            clearTimeout(authTimer);
+            onStatus(msg);
+          }
+        } catch { /* Ignore non-JSON status messages */ }
+      } else if (authenticated && event.data instanceof Blob && event.data.size) {
+        onFrame(URL.createObjectURL(event.data));
+      }
+    };
+    socket.onerror = () => {
+      socket.close();
+      if (!signal.aborted) finish(new Error("WebSocket network error. Check the camera gateway."));
+    };
+    socket.onclose = (event) => {
+      if (signal.aborted) return finish();
+      finish(new Error(event.code === 1008
+        ? "WebSocket access denied. Sign in with your CareFur admin account."
+        : "Camera WebSocket disconnected. Retry Start Stream."));
+    };
+  });
+}
