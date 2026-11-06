@@ -65,6 +65,22 @@ export default function AccessCodeStep({
           />
         )}
 
+        <ResultRow
+          label="Email Notification"
+          value={result?.email?.sent
+            ? "Sent"
+            : `Not sent${result?.email?.error ? `: ${result.email.error}` : ""}`}
+        />
+
+        <ResultRow
+          label="SMS Notification"
+          value={result?.sms?.queued
+            ? `Queued for sending${result.sms.recipient ? ` to ${result.sms.recipient}` : ""} (delivery not yet confirmed)`
+            : result?.sms?.error
+              ? `Not sent: ${result.sms.error}`
+              : "Not sent"}
+        />
+
         {expiresAt && (
           <ResultRow
             label="Access Code Expires"

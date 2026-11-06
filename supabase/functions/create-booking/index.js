@@ -10,6 +10,7 @@ import { createClient } from "@supabase/supabase-js";
    - One-time boarding access code
    - SHA-256 access-code hashing
    - Resend email delivery
+   - TextBee SMS notification (server-side)
 ========================================================= */
 
 const DEFAULT_ALLOWED_ORIGINS = [
@@ -505,6 +506,74 @@ Deno.serve(async (request) => {
     }
 
     /* =====================================================
+       SEND TEXTBEE SMS
+       Both existing and new owners use the owner record phone.
+       SMS failure must never roll back a valid booking.
+    ===================================================== */
+
+    const ownerPhone =
+      ownerRecord?.phone ??
+      authenticatedOwner?.phone ??
+      input.newCustomer?.owner?.phone ??
+      null;
+
+    let smsResult = {
+      queued: false,
+      status: "not_sent",
+      recipient: null,
+      batchId: null,
+      error: null,
+    };
+
+    try {
+      const recipient = normalizePhilippinePhone(ownerPhone);
+
+      if (!recipient) {
+        smsResult = {
+          ...smsResult,
+          status: "skipped",
+          error: ownerPhone
+            ? "Owner phone number is not a valid Philippine mobile number."
+            : "Owner has no phone number on record.",
+        };
+      } else {
+        const sendResult = await sendBoardingAccessSms({
+          recipient,
+          ownerName:
+            ownerRecord?.full_name ??
+            authenticatedOwner?.full_name ??
+            "Pet Owner",
+          petName: pet.name,
+          bookingCode: booking.booking_code,
+          accessCode,
+          roomName: room.room_name || room.room_number,
+          checkInAt: booking.check_in_at,
+          expectedCheckOutAt: booking.expected_check_out_at,
+          expiresAt: accessRecord.expires_at,
+        });
+
+        smsResult = {
+          queued: true,
+          status: "queued",
+          recipient,
+          batchId: sendResult?.smsBatchId ??
+            sendResult?.data?.smsBatchId ?? null,
+          error: null,
+        };
+      }
+    } catch (smsError) {
+      // Do not expose API keys, access codes, or raw provider responses in logs.
+      console.error("Boarding SMS queue request failed.");
+      smsResult = {
+        ...smsResult,
+        status: "failed",
+        error: smsError instanceof Error
+          ? smsError.message
+          : "Unable to queue boarding access SMS.",
+      };
+    }
+
+    /* =====================================================
        SUCCESS RESPONSE
     ===================================================== */
 
@@ -514,9 +583,7 @@ Deno.serve(async (request) => {
         success: true,
 
         message:
-          emailResult.sent
-            ? "Booking created successfully. Owner access email sent."
-            : "Booking created successfully, but owner access email could not be sent.",
+          "Booking created successfully. Check the separate email and SMS statuses.",
 
         booking,
 
@@ -553,6 +620,9 @@ Deno.serve(async (request) => {
 
         email:
           emailResult,
+
+        sms:
+          smsResult,
       },
       201,
     );
@@ -1918,6 +1988,86 @@ async function createBookingAccess({
   }
 
   return data;
+}
+
+/* =========================================================
+   TEXTBEE SMS NOTIFICATION
+   Server-side only. Set TEXTBEE_API_KEY as a Supabase secret,
+   not in a VITE_ variable or the browser's .env.local.
+========================================================= */
+
+function normalizePhilippinePhone(rawPhone) {
+  if (typeof rawPhone !== "string") return null;
+
+  const value = rawPhone.trim().replace(/[\s()\-.]/g, "");
+  let phone = value;
+
+  if (/^09\d{9}$/.test(phone)) {
+    phone = "+63" + phone.slice(1);
+  } else if (/^639\d{9}$/.test(phone)) {
+    phone = "+" + phone;
+  } else if (/^9\d{9}$/.test(phone)) {
+    phone = "+63" + phone;
+  }
+
+  return /^\+639\d{9}$/.test(phone) ? phone : null;
+}
+
+async function sendBoardingAccessSms({
+  recipient,
+  ownerName,
+  petName,
+  bookingCode,
+  accessCode,
+  roomName,
+  checkInAt,
+  expectedCheckOutAt,
+  expiresAt,
+}) {
+  const apiKey = Deno.env.get("TEXTBEE_API_KEY");
+  if (!apiKey) {
+    throw new Error("TEXTBEE_API_KEY is not configured in Supabase secrets.");
+  }
+
+  // Use a concise plain-text SMS. Messages may be split into segments.
+  const message = [
+    "CareFur - Snuggles Premium Pet Hotel",
+    `Hello ${ownerName || "Pet Owner"}, ${petName || "your pet"}'s boarding is registered.`,
+    `Booking: ${bookingCode}`,
+    `Room: ${roomName || "Assigned room"}`,
+    `Check-in: ${formatPhilippineDateTime(checkInAt)}`,
+    `Checkout: ${formatPhilippineDateTime(expectedCheckOutAt)}`,
+    `Boarding Access Code: ${accessCode}`,
+    'Open the Snuggles app > "Enter Boarding Code" and enter this code.',
+    "Code can be redeemed once. After redemption, sign in normally.",
+    `Expires: ${formatPhilippineDateTime(expiresAt)}`,
+    "Do not share this code.",
+  ].join("\n");
+
+  const deviceId = Deno.env.get("TEXTBEE_DEVICE_ID")?.trim();
+  const response = await fetch(
+    "https://api.textbee.dev/api/v1/gateway/send-sms",
+    {
+      method: "POST",
+      headers: {
+        "x-api-key": apiKey,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        recipients: [recipient],
+        message,
+        ...(deviceId ? { deviceId } : {}),
+      }),
+      signal: AbortSignal.timeout(15000),
+    },
+  );
+
+  if (!response.ok) {
+    // Omit TextBee's raw response to avoid exposing contact and code data.
+    throw new Error(`TextBee rejected the SMS request (HTTP ${response.status}).`);
+  }
+
+  return await response.json();
 }
 
 /* =========================================================

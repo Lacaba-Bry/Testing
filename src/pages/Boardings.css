@@ -168,3 +168,7 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Staff actions on pending boarding records */
+.boarding-row-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.boarding-row-actions .ui-button { white-space: nowrap; }
