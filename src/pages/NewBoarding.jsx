@@ -493,7 +493,7 @@ function getFeedingStepValidationMessage(feeding) {
     "invalid-instructions": `Please enter valid feeding instructions for ${scheduleName}.`,
     "missing-instructions": `Please enter feeding instructions for ${scheduleName}.`,
     "invalid-compartment": `Please select a valid feeder compartment for ${scheduleName}.`,
-    "invalid-portion": `Please enter a valid portion for ${scheduleName}.`,
+    "invalid-portion": `Automatic feeding uses fixed compartments for ${scheduleName}.`,
   };
 
   return messages[issue.code];

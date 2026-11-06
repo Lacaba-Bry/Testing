@@ -95,7 +95,13 @@ export default function FeederScheduleTester({ deviceId }) {
       </>}
       <button className="feeder-schedule-save" type="submit" disabled={!deviceId || busy}>{busy ? "Saving..." : "Save feeding schedule"}</button>
     </form>
-    <p className="feeder-schedule-info">This tester uses Supabase scheduling and requires internet access. It does not use the DS3231 yet. A scheduled command is skipped if another feeder command is pending or running.</p>
+    <p className="feeder-schedule-info">This is a separate CLOUD schedule tester, NOT the RTC schedule. Disable cloud test schedules and cloud dispatch cron before using RTC mode. This tester uses Supabase scheduling and requires internet access. It does not use the DS3231. The separate offline firmware tester uses the DS3231 instead; do not enable both schedulers on the same physical motor.</p>
+    <details className="feeder-schedule-info">
+      <summary><strong>Offline DS3231 bench test (separate ESP32 sketch)</strong></summary>
+      <p>Wire VCC→3V3, GND→GND, SDA→GPIO21, SCL→GPIO22. Upload the included offline RTC test sketch, then open Arduino Serial Monitor at 115200 baud.</p>
+      <pre>{`SHOW\nCLOCK 2026 11 06 20 30 00\nSET 1 08:00\nSET 2 13:00\nSET 3 19:00\nTEST 1`}</pre>
+      <p>Morning = slot 1; afternoon = slot 2; evening = slot 3. The sketch starts in dry-run mode with motor output disabled. Change the example date/time to your current Philippine local time before testing. This page cannot write schedules to an offline board.</p>
+    </details>
     {message && <p className="feeder-schedule-success" role="status">{message}</p>}
     {error && <p className="feeder-schedule-error" role="alert">{error}</p>}
     <div className="feeder-schedule-header"><h3>Saved schedules</h3></div>

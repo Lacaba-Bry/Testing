@@ -1,3 +1,4 @@
+import { compartmentForPeriod } from "../utils/feederCompartments";
 import {
   useCallback,
   useState,
@@ -260,7 +261,7 @@ function getSubmissionFeedingMessage(issue) {
     "invalid-time": `${scheduleName} has an invalid time.`,
     "invalid-instructions": `${scheduleName} has invalid feeding instructions.`,
     "invalid-compartment": `Select compartment 1, 2, or 3 for ${scheduleName}.`,
-    "invalid-portion": `Enter a valid portion for ${scheduleName}.`,
+    "invalid-portion": `Automatic feeding uses fixed compartments for ${scheduleName}.`,
   };
 
   return messages[issue.code] || "Invalid feeding information.";
@@ -365,18 +366,10 @@ function buildBookingPayload(formData) {
           compartmentNumber:
             feeding.method ===
             "automatic"
-              ? Number(
-                  schedule.compartment,
-                )
+              ? compartmentForPeriod(schedule.period)
               : null,
 
-          portionGrams:
-            feeding.method ===
-            "automatic"
-              ? Number(
-                  schedule.portion,
-                )
-              : null,
+          portionGrams: null,
         })),
     },
 

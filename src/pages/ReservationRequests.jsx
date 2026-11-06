@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
 import { supabase } from "../services/supabaseClient";
 import PageHeader from "../components/common/PageHeader";
 import Button from "../components/common/Button";
@@ -103,7 +102,6 @@ export default function ReservationRequests() {
       } />
       {error && <div className="cf-rr-message cf-rr-error" role="alert">{error}</div>}
       {notice && !error && <div className="cf-rr-message cf-rr-success" role="status">{notice}</div>}
-      <p className="cf-rr-workflow-note">Website reservations are requests only. Confirming one does not automatically create a boarding or send an access code. After confirming payment and availability, create its boarding from <Link to="/boarding/new">New Boarding</Link>; the normal booking flow handles email and TextBee SMS.</p>
       <div className="cf-rr-toolbar">
         <div className="cf-rr-search-wrap">
           <label htmlFor="cf-rr-search">Search requests</label>

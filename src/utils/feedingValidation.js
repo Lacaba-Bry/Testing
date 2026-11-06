@@ -1,3 +1,4 @@
+import { compartmentForPeriod } from "./feederCompartments";
 export const VALID_FEEDING_METHODS = [
   "manual",
   "automatic",
@@ -43,19 +44,8 @@ export function getFeedingValidationIssue(
     }
 
     if (feeding.method === "automatic") {
-      const compartment = Number(schedule.compartment);
-      const portion = Number(schedule.portion);
-
-      if (
-        !Number.isInteger(compartment) ||
-        compartment < 1 ||
-        compartment > 3
-      ) {
+      if (!compartmentForPeriod(schedule.period)) {
         return { code: "invalid-compartment", schedule, index };
-      }
-
-      if (!Number.isFinite(portion) || portion <= 0) {
-        return { code: "invalid-portion", schedule, index };
       }
     }
   }

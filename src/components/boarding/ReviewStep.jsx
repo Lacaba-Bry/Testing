@@ -1,3 +1,4 @@
+import { compartmentForPeriod } from "../../utils/feederCompartments";
 export default function ReviewStep({
   formData,
   selectedRoom,
@@ -167,20 +168,7 @@ export default function ReviewStep({
                     <>
                       <ReviewRow
                         label="Compartment"
-                        value={
-                          schedule.compartment
-                            ? `Compartment ${schedule.compartment}`
-                            : "Not selected"
-                        }
-                      />
-
-                      <ReviewRow
-                        label="Portion"
-                        value={
-                          schedule.portion
-                            ? `${schedule.portion} grams`
-                            : "Not provided"
-                        }
+                        value={`Compartment ${compartmentForPeriod(schedule.period)} (automatic)`}
                       />
                     </>
                   )}

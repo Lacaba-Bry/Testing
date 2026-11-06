@@ -1,11 +1,12 @@
 import {
   BellRinging,
   CalendarCheck,
-  CalendarPlus,
   ClipboardText,
+  CalendarPlus,
   Camera,
   ChatCircleDots,
   Circuitry,
+  Cube,
   ForkKnife,
   GearSix,
   House,
@@ -58,6 +59,7 @@ const groups = [
 ];
 
 const hardwareItems = [
+  { label: "Smart Units", to: "/smart-units", icon: Cube },
   { label: "Connection Manual", to: "/connection-manual", icon: BookOpenText },
   { label: "Camera Wi-Fi", to: "/hardware-setup", icon: WifiHigh },
   { label: "Feeder ESP32", to: "/motor-test", icon: GearSix },

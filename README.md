@@ -26,3 +26,7 @@ npm run build
 ```
 
 All protected routes, existing Edge Function calls, and the existing database schema are retained.
+
+## ESP32 feeder firmware
+
+Use one sketch: `firmware/CareFur_Feeder_RTC_Integrated/CareFur_Feeder_RTC_Integrated.ino`. RTC test is integrated (Serial `J` for status, `K` for dry-run schedule diagnostics). See `FIRMWARE_RTC_SETUP.md`.
