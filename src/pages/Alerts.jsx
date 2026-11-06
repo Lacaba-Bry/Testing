@@ -6,15 +6,24 @@ import EmptyState from "../components/common/EmptyState";
 import PageHeader from "../components/common/PageHeader";
 import useAlerts from "../hooks/useAlerts";
 import "./Alerts.css";
+import useFeederFood from "../hooks/useFeederFood";
+import { FoodEventList } from "../components/FeederFoodMonitor";
 
 export default function Alerts() {
   const { alerts, loading, updatingId, error, refresh, updateAlert } = useAlerts();
+  const { events: foodEvents, error: foodError } = useFeederFood();
   const [filter, setFilter] = useState("active");
   const visible = useMemo(() => alerts.filter((item) => filter === "all" || item.status === filter).sort((a,b)=>({critical:0,warning:1,info:2}[a.severity]??3)-({critical:0,warning:1,info:2}[b.severity]??3) || new Date(b.created_at)-new Date(a.created_at)), [alerts, filter]);
 
   return (
     <section className="alerts-page">
       <PageHeader eyebrow="Monitoring" title="Alerts" description="Review feeder, camera, missed-feeding, and device issues that need staff attention." actions={<Button variant="secondary" onClick={refresh}><ArrowClockwise size={18}/> Refresh</Button>} />
+      <section className="food-alerts-section" aria-label="Load cell activity notifications">
+        <h2>Load Cell Activity Notifications</h2>
+        <p>Latest food detections, possible-eating events, and empty-plate notices. These test notifications are separate from actionable system alerts.</p>
+        {foodError && <p className="food-monitor-error" role="alert">{foodError}</p>}
+        <FoodEventList events={foodEvents.slice(0, 15)} />
+      </section>
       <div className="segmented-control alerts-filters">{["active","acknowledged","resolved","all"].map((item)=><button key={item} className={filter===item?"active":""} type="button" onClick={()=>setFilter(item)}>{item}</button>)}</div>
       {error && <div className="page-alert page-alert--error">{error}</div>}
       {loading ? <div className="page-loading">Loading alerts…</div> : visible.length === 0 ? <EmptyState icon={CheckCircle} title="No alerts in this view" message="There are no alerts matching the selected status." /> : (

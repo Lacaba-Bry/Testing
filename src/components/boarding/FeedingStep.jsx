@@ -1,3 +1,4 @@
+import { compartmentForPeriod } from "../../utils/feederCompartments";
 export default function FeedingStep({
   formData,
   updateForm,
@@ -23,13 +24,10 @@ export default function FeedingStep({
 
         compartment:
           method === "automatic"
-            ? schedule.compartment ?? 1
+            ? compartmentForPeriod(schedule.period)
             : null,
 
-        portion:
-          method === "automatic"
-            ? schedule.portion ?? ""
-            : "",
+        portion: null,
       }),
     );
 
@@ -79,15 +77,9 @@ export default function FeedingStep({
       time: "",
       instructions: "",
 
-      compartment:
-        feeding.method === "automatic"
-          ? 1
-          : null,
+      compartment: feeding.method === "automatic" ? compartmentForPeriod(period) : null,
 
-      portion:
-        feeding.method === "automatic"
-          ? ""
-          : "",
+      portion: null,
     };
 
     updateFeeding("schedules", [
@@ -241,61 +233,11 @@ export default function FeedingStep({
               />
             </label>
 
-            {feeding.method ===
-              "automatic" && (
-              <>
-                <label>
-                  Feeder Compartment
-
-                  <select
-                    value={
-                      schedule.compartment ?? 1
-                    }
-                    onChange={(event) =>
-                      updateSchedule(
-                        index,
-                        "compartment",
-                        Number(
-                          event.target.value,
-                        ),
-                      )
-                    }
-                  >
-                    <option value={1}>
-                      Compartment 1
-                    </option>
-
-                    <option value={2}>
-                      Compartment 2
-                    </option>
-
-                    <option value={3}>
-                      Compartment 3
-                    </option>
-                  </select>
-                </label>
-
-                <label>
-                  Portion (grams)
-
-                  <input
-                    type="number"
-                    min="1"
-                    step="0.01"
-                    value={
-                      schedule.portion
-                    }
-                    placeholder="e.g. 150"
-                    onChange={(event) =>
-                      updateSchedule(
-                        index,
-                        "portion",
-                        event.target.value,
-                      )
-                    }
-                  />
-                </label>
-              </>
+            {feeding.method === "automatic" && (
+              <p className="boarding-description">
+                Automatically assigned: Compartment {compartmentForPeriod(schedule.period)}
+                ({formatPeriod(schedule.period)}). The feeder dispenses one configured slot per meal; no grams input is required.
+              </p>
             )}
 
             <button

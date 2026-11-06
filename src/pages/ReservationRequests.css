@@ -28,5 +28,3 @@
 .cf-rr-empty{background:#fff;border:1px solid var(--rr-border);border-radius:14px;padding:27px 20px;color:#55716d;grid-column:1/-1}
 @media(max-width:600px){.cf-rr-card{padding:15px}.cf-rr-card-top{flex-wrap:wrap}.cf-rr-details{padding:13px;gap:13px}.cf-rr-actions{width:100%}.cf-rr-actions button{flex:1}.cf-rr-toolbar{align-items:stretch}.cf-rr-summary{padding:0}}
 @media(max-width:370px){.cf-rr-details{grid-template-columns:1fr}}
-
-.cf-rr-workflow-note{margin:14px 0 0;padding:12px 15px;border:1px solid #cdded8;border-radius:12px;background:#f4f8f6;color:#365f5a;font-size:13px;line-height:1.55}.cf-rr-workflow-note a{color:#0c6f65;font-weight:750;text-decoration:underline}

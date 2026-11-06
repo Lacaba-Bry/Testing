@@ -1017,45 +1017,12 @@ function validateFeeding(
           method ===
           "automatic"
         ) {
-          compartmentNumber =
-            Number(
-              schedule
-                ?.compartmentNumber ??
-                schedule
-                  ?.compartment,
-            );
-
-          portionGrams =
-            Number(
-              schedule
-                ?.portionGrams ??
-                schedule
-                  ?.portion,
-            );
-
-          if (
-            !Number.isInteger(
-              compartmentNumber,
-            ) ||
-            compartmentNumber < 1 ||
-            compartmentNumber > 3
-          ) {
-            throw new AppError(
-              `Invalid feeder compartment for ${period}.`,
-              400,
-            );
-          }
-
-          if (
-            !Number.isFinite(
-              portionGrams,
-            ) ||
-            portionGrams <= 0
-          ) {
-            throw new AppError(
-              `Invalid food portion for ${period}.`,
-              400,
-            );
+          // Never trust a client-provided compartment or grams for automatic meals.
+          const mealSlots = { morning: 1, afternoon: 2, evening: 3 };
+          compartmentNumber = mealSlots[String(period).toLowerCase()] ?? null;
+          portionGrams = null;
+          if (compartmentNumber === null) {
+            throw new AppError(`Invalid automatic feeding period: ${period}.`, 400);
           }
         }
 

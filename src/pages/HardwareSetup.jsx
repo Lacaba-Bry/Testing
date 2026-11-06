@@ -45,7 +45,7 @@ export default function HardwareSetup(){
   }
   const networks=Array.isArray(data?.saved_networks)?data.saved_networks:[];
   return <section className="hardware-setup feeder-wifi-page">
-    <PageHeader eyebrow="Hardware Monitoring" title="Camera Wi-Fi Setup" description="Automatic ESP32-CAM Wi-Fi status and remote switching between saved networks."/>
+    <PageHeader eyebrow="Hardware Monitoring" title="Camera Wi-Fi Connection" description="Monitor camera Wi-Fi status, saved networks, and gateway connectivity."/>
     <div className="hardware-note"><Info size={24}/><div><strong>Automatic cloud monitoring</strong><p>ESP32-CAM reports approximately every 5 seconds. This page checks every 3 seconds and marks the camera offline after 20 seconds without a heartbeat. The video gateway is tested separately.</p></div></div>
     <div className="hardware-panel"><div className="hardware-section-heading"><Camera size={24}/><h2>Camera Wi-Fi connection</h2></div>
       <div className="hardware-info-grid">
@@ -70,7 +70,7 @@ export default function HardwareSetup(){
       {switchInfo?.state==="pending"&&<p className="hardware-subtle">Switch requested: {switchInfo.target_ssid}</p>}
       <p className="hardware-subtle">Switching may interrupt video. The Node.js camera gateway must be able to reach the camera's new local IP and network.</p>
     </div>
-    <div className="hardware-panel"><h2>Shared setup with feeder</h2>
+    <div className="hardware-panel"><h2>Manual reconnect steps</h2>
       <p>With shared-setup firmware installed on both devices, join <strong>CareFur-Feeder-Setup</strong> on your phone. Enter router Wi-Fi once at <strong>http://192.168.4.1</strong>. If this camera cannot reach its saved router, it automatically joins the feeder setup hotspot to securely collect the same network settings, then connects to the router independently.</p>
       <p>Keep both devices powered and nearby for first-time pairing. Existing camera-only recovery remains available at <strong>http://192.168.9.1:8080</strong> while connected to CareFur-Camera-Setup.</p>
       <div className="hardware-actions"><a className="hardware-primary hardware-link" href="http://192.168.4.1/" target="_blank" rel="noopener noreferrer">Open feeder shared setup <ArrowSquareOut size={17}/></a><Link className="hardware-secondary hardware-link" to="/feeder-wifi-manager">Feeder Wi-Fi Manager</Link></div>

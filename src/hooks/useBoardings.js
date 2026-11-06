@@ -12,11 +12,6 @@ export default function useBoardings() {
     setError("");
 
     try {
-      // Server updates overdue pending stays. The database remains authoritative.
-      const { error: refreshError } = await supabase.rpc("carefur_refresh_no_shows");
-      if (refreshError) {
-        console.warn("No-show refresh unavailable:", refreshError.message);
-      }
       const list = await fetchAllPages(()=>supabase
         .from("bookings")
         .select(`
