@@ -2,6 +2,7 @@ import {
   BellRinging,
   CalendarCheck,
   CalendarPlus,
+  ClipboardText,
   Camera,
   ChatCircleDots,
   Circuitry,
@@ -38,6 +39,7 @@ const groups = [
     title: "Stays",
     items: [
       { label: "Boarding List", to: "/boardings", icon: CalendarCheck },
+      { label: "Reservation Requests", to: "/reservation-requests", icon: ClipboardText },
       { label: "Rooms", to: "/rooms", icon: House },
       { label: "Pets", to: "/pets", icon: PawPrint },
     ],

@@ -10,7 +10,7 @@ import PageHeader from "../components/common/PageHeader";
 import useBoardings from "../hooks/useBoardings";
 import "./Boardings.css";
 
-const filters = ["all", "pending", "checked_in", "checked_out", "cancelled"];
+const filters = ["all", "pending", "checked_in", "checked_out", "no_show", "cancelled"];
 const EXPORT_COLUMNS = [
   "Booking code",
   "Pet",
@@ -35,6 +35,9 @@ export default function Boardings() {
   const [search, setSearch] = useState(() => params.get("q") || "");
   const [status, setStatus] = useState("all");
   const [page, setPage] = useState(1);
+  const [actionBookingId, setActionBookingId] = useState(null);
+  const [actionError, setActionError] = useState("");
+  const [actionSuccess, setActionSuccess] = useState("");
   const [exportOpen, setExportOpen] = useState(false);
   const [exportScope, setExportScope] = useState("filtered");
   const [exportFormat, setExportFormat] = useState("xlsx");
@@ -63,6 +66,32 @@ export default function Boardings() {
   const pageCount = Math.max(1, Math.ceil(filtered.length / 25));
   const currentPage = Math.min(page, pageCount);
   const paged = filtered.slice((currentPage - 1) * 25, currentPage * 25);
+
+  async function performBoardingAction(booking, action) {
+    if (actionBookingId) return;
+    const isCheckIn = action === "check_in";
+    const prompt = isCheckIn
+      ? `Confirm that ${booking.pet?.name || "the pet"} has physically arrived? Check-in will start now and adjust the stay dates.`
+      : `Cancel booking ${booking.booking_code || ""}? This expires its boarding access.`;
+    if (!window.confirm(prompt)) return;
+    setActionBookingId(booking.id);
+    setActionError("");
+    setActionSuccess("");
+    try {
+      // Server validates staff permissions, current status and room availability.
+      const { error: actionFail } = await supabase.rpc("carefur_staff_boarding_action", {
+        p_booking_id: booking.id,
+        p_action: action,
+      });
+      if (actionFail) throw actionFail;
+      setActionSuccess(isCheckIn ? "Pet checked in successfully." : "Booking cancelled successfully.");
+      await refresh();
+    } catch (failure) {
+      setActionError(failure?.message || "Could not update boarding.");
+    } finally {
+      setActionBookingId(null);
+    }
+  }
 
   async function runExport() {
     setExporting(true);
@@ -223,6 +252,8 @@ export default function Boardings() {
       </div>
 
       {error && <div className="page-alert page-alert--error">{error}</div>}
+      {actionError && <div className="page-alert page-alert--error">{actionError}</div>}
+      {actionSuccess && <div className="page-alert">{actionSuccess}</div>}
 
       {loading ? (
         <div className="page-loading">Loading boardings…</div>
@@ -241,6 +272,7 @@ export default function Boardings() {
                   <th>Check-in</th>
                   <th>Check-out</th>
                   <th>Status</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -261,6 +293,14 @@ export default function Boardings() {
                     <td>
                       <Badge tone={toneForStatus(item.status)}>{formatStatus(item.status)}</Badge>
                     </td>
+                    <td>
+                      {item.status === "pending" && isAdmin ? (
+                        <div className="boarding-row-actions">
+                          <Button size="sm" disabled={Boolean(actionBookingId)} onClick={() => performBoardingAction(item, "check_in")}>Check In</Button>
+                          <Button size="sm" variant="secondary" disabled={Boolean(actionBookingId)} onClick={() => performBoardingAction(item, "cancel")}>Cancel</Button>
+                        </div>
+                      ) : <span aria-label="No actions available">—</span>}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -280,6 +320,12 @@ export default function Boardings() {
                 <p>
                   {formatDateTime(item.check_in_at)} – {formatDateTime(item.expected_check_out_at)}
                 </p>
+                {item.status === "pending" && isAdmin && (
+                  <div className="boarding-row-actions">
+                    <Button size="sm" disabled={Boolean(actionBookingId)} onClick={() => performBoardingAction(item, "check_in")}>Check In</Button>
+                    <Button size="sm" variant="secondary" disabled={Boolean(actionBookingId)} onClick={() => performBoardingAction(item, "cancel")}>Cancel</Button>
+                  </div>
+                )}
               </article>
             ))}
           </div>
@@ -378,7 +424,7 @@ function formatStatus(value) {
 function toneForStatus(status) {
   if (status === "checked_in") return "success";
   if (status === "pending") return "warning";
-  if (status === "cancelled") return "danger";
+  if (status === "cancelled" || status === "no_show") return "danger";
   return "neutral";
 }
 
