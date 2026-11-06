@@ -1,0 +1,31 @@
+[functions.create-staff]
+enabled = true
+verify_jwt = true
+import_map = "./functions/create-staff/deno.json"
+entrypoint = "./functions/create-staff/index.js"
+
+[functions.create-booking]
+enabled = true
+verify_jwt = true
+import_map = "./functions/create-booking/deno.json"
+entrypoint = "./functions/create-booking/index.js"
+
+[functions.motor-test]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/motor-test/index.ts"
+
+[functions.feeder-rotate]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/feeder-rotate/index.ts"
+
+[functions.feeder-test-command]
+enabled = true
+verify_jwt = false
+entrypoint = "./functions/feeder-test-command/index.ts"
+
+[functions.feeder-wifi-status]
+enabled = true
+verify_jwt = false # Device uses its own x-device-secret; admin read verifies JWT in code.
+entrypoint = "./functions/feeder-wifi-status/index.ts"
