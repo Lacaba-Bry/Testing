@@ -1,0 +1,30 @@
+/* CareFur reservation-only styles: scoped to prevent conflicts with other pages. */
+.cf-rr-page{--rr-dark:#104f4b;--rr-ink:#173c3e;--rr-border:#dce7e3;--rr-soft:#f4f8f6;padding-bottom:40px}
+.cf-rr-toolbar{display:flex;justify-content:space-between;align-items:end;flex-wrap:wrap;gap:16px;margin-top:19px}
+.cf-rr-search-wrap{flex:1 1 270px;max-width:530px;display:flex;flex-direction:column;gap:7px}
+.cf-rr-search-wrap label{font-size:12px;font-weight:700;color:var(--rr-ink)}
+.cf-rr-search-wrap input{width:100%;min-height:45px;padding:11px 14px;border:1px solid #c8d8d3;border-radius:12px;outline:none;color:var(--rr-ink);background:#fff;font:inherit}
+.cf-rr-search-wrap input:focus{border-color:#16736d;box-shadow:0 0 0 3px #16736d22}
+.cf-rr-summary{font-size:12px;color:#54716f;padding-bottom:9px}
+.cf-rr-filters{margin:18px 0 16px!important;gap:9px!important}
+.cf-rr-filters button{font-size:13px;font-weight:650;display:inline-flex;align-items:center;gap:8px;transition:background .16s ease}
+.cf-rr-filter-count{border-radius:20px;min-width:20px;text-align:center;padding:2px 6px;background:#eaf2ef;color:#24665f;font-size:11px}
+.cf-rr-filters button.active .cf-rr-filter-count{background:#ffffff30;color:#fff}
+.cf-rr-results{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,490px),1fr));gap:16px;align-items:start}
+.cf-rr-card{background:#fff;border:1px solid var(--rr-border);border-radius:17px;padding:21px;box-shadow:0 5px 20px rgba(24,65,57,.035);min-width:0}
+.cf-rr-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:20px}
+.cf-rr-overline{font-size:10px;font-weight:800;letter-spacing:1.2px;color:#6b8782;margin-bottom:5px}
+.cf-rr-identity{min-width:0}.cf-rr-identity h3{font-size:20px;line-height:1.25;margin:0 0 5px;color:var(--rr-ink);overflow-wrap:anywhere}
+.cf-rr-reference{font-size:12px;color:#567672;overflow-wrap:anywhere}
+.cf-rr-status{font-size:11px;font-weight:800;white-space:nowrap;padding:7px 11px;border-radius:99px;color:#47565b;background:#eef0f1}
+.cf-rr-status-pending_payment{background:#fff3d6;color:#97610d}.cf-rr-status-confirmed{background:#dff4e8;color:#217347}.cf-rr-status-declined{background:#ffe8e6;color:#a53f35}.cf-rr-status-cancelled{background:#f0f2f4;color:#596a71}
+.cf-rr-details{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px 20px;background:var(--rr-soft);border-radius:12px;padding:17px}
+.cf-rr-detail{min-width:0;display:flex;flex-direction:column;gap:5px}.cf-rr-detail span,.cf-rr-notes span{font-size:11px;color:#65817e;font-weight:650}.cf-rr-detail strong{font-size:13px;color:var(--rr-ink);font-weight:650;overflow-wrap:anywhere}
+.cf-rr-total strong{font-size:17px;color:#0d6b62}
+.cf-rr-notes{margin-top:15px;padding:13px 16px;border:1px dashed #cbded8;border-radius:11px}.cf-rr-notes p{margin:7px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px;color:var(--rr-ink)}
+.cf-rr-card-footer{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:18px;flex-wrap:wrap}.cf-rr-card-footer small{font-size:11px;color:#6b827e}
+.cf-rr-actions{display:flex;gap:9px;flex-wrap:wrap}.cf-rr-actions button{white-space:nowrap}
+.cf-rr-message{border-radius:12px;padding:14px 16px;margin-top:15px;font-size:13px}.cf-rr-error{background:#fff2ed;color:#a63524;border:1px solid #f1c1b7}.cf-rr-success{background:#eaf8ef;color:#1c7345;border:1px solid #b4dfc5}
+.cf-rr-empty{background:#fff;border:1px solid var(--rr-border);border-radius:14px;padding:27px 20px;color:#55716d;grid-column:1/-1}
+@media(max-width:600px){.cf-rr-card{padding:15px}.cf-rr-card-top{flex-wrap:wrap}.cf-rr-details{padding:13px;gap:13px}.cf-rr-actions{width:100%}.cf-rr-actions button{flex:1}.cf-rr-toolbar{align-items:stretch}.cf-rr-summary{padding:0}}
+@media(max-width:370px){.cf-rr-details{grid-template-columns:1fr}}
