@@ -22,9 +22,8 @@ import StaffManagement from "./pages/StaffManagement";
 import MotorTest from "./pages/MotorTest";
 import CameraTest from "./pages/CameraTest";
 import HardwareSetup from "./pages/HardwareSetup";
-import ConnectionManual from "./pages/ConnectionManual";
-import ClientInquiries from "./pages/ClientInquiries";
 import FeederWiFiManager from "./pages/FeederWiFiManager";
+import DeviceManual from "./pages/DeviceManual";
 
 export default function App() {
   const [loading, setLoading] = useState(() => !sessionStorage.getItem("carefur-splash-seen") && !Object.keys(localStorage).some(key => key.startsWith("sb-") && key.endsWith("-auth-token")));
@@ -60,11 +59,10 @@ export default function App() {
         <Route path="/cameras" element={<Cameras />} />
         <Route path="/alerts" element={<Alerts />} />
         <Route path="/messages" element={<Messages />} />
-        <Route path="/inquiries" element={<ClientInquiries />} />
-        <Route path="/connection-manual" element={<AdminRoute><ConnectionManual /></AdminRoute>} />
         <Route path="/motor-test" element={<AdminRoute><MotorTest /></AdminRoute>} />
         <Route path="/feeder-wifi-manager" element={<AdminRoute><FeederWiFiManager /></AdminRoute>} />
         <Route path="/camera-test" element={<AdminRoute><CameraTest /></AdminRoute>} />
+        <Route path="/device-manual" element={<AdminRoute><DeviceManual /></AdminRoute>} />
         <Route path="/hardware-setup" element={<AdminRoute><HardwareSetup /></AdminRoute>} />
 
         <Route
