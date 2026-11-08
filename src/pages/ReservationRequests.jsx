@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "../services/supabaseClient";
 import PageHeader from "../components/common/PageHeader";
 import Button from "../components/common/Button";
@@ -38,7 +39,7 @@ export default function ReservationRequests() {
     try {
       const { data, error: requestError } = await supabase
         .from("reservation_requests")
-        .select(`id,request_code,owner_name,owner_email:email,owner_phone:phone,pet_name,species:pet_species,breed:pet_breed,room_id,requested_room_number,check_in:check_in_at,check_out:expected_check_out_at,notes:special_instructions,status,created_at,room_rate_per_night,nights,estimated_total`)
+        .select(`id,request_code,owner_name,owner_email:email,owner_phone:phone,pet_name,species:pet_species,breed:pet_breed,room_id,requested_room_number,check_in:check_in_at,check_out:expected_check_out_at,notes:special_instructions,status,created_at,room_rate_per_night,nights,estimated_total,boarding_booking_id,paid_at,paid_sms_status,paid_sms_error`)
         .order("created_at", { ascending: false })
         .limit(300);
       if (requestError) throw requestError;
@@ -72,9 +73,7 @@ export default function ReservationRequests() {
 
   const decide = async (item, nextStatus) => {
     if (busy) return;
-    const confirmText = nextStatus === "confirmed"
-      ? `Confirm reservation ${item.request_code || ""} for ${item.pet_name || "this pet"}?\n\nVerify room availability and payment first. This does not create a boarding record automatically.`
-      : `Decline reservation ${item.request_code || ""}?`;
+    const confirmText = `Decline reservation ${item.request_code || ""}?`;
     if (!window.confirm(confirmText)) return;
     setBusy(item.id);
     setError("");
@@ -95,9 +94,38 @@ export default function ReservationRequests() {
     }
   };
 
+  const pay = async (item, action = "paid") => {
+    if (busy) return;
+    if (action === "paid" && !window.confirm(
+      `Confirm full payment for ${item.pet_name || "this pet"} (${item.request_code || "reservation"})?\n\nThis creates a pending boarding and queues a confirmation SMS with the boarding access code.`,
+    )) return;
+    if (action === "retry_sms" && !window.confirm("Retry sending the confirmation SMS? An unredeemed access code will be regenerated.")) return;
+    setBusy(item.id);
+    setError("");
+    setNotice("");
+    try {
+      const { data, error: invokeError } = await supabase.functions.invoke("mark-reservation-paid", {
+        body: { request_id: item.id, action },
+      });
+      if (invokeError) {
+        let detail = invokeError.message;
+        try { const response = await invokeError.context?.json(); detail = response?.error || detail; } catch { /* ignore */ }
+        throw new Error(detail);
+      }
+      if (!data?.success) throw new Error(data?.error || "Could not confirm payment.");
+      setFilter("confirmed");
+      setNotice(data.message || "Boarding created. Check SMS status below.");
+      await load();
+    } catch (err) {
+      setError(err?.message || "Payment confirmation failed.");
+    } finally {
+      setBusy(null);
+    }
+  };
+
   return (
     <section className="cf-feature-page cf-rr-page">
-      <PageHeader title="Reservation Requests" description="Review website reservations, confirm availability, and manage customer requests." actions={
+      <PageHeader title="Reservation Requests" description="Mark payment received to create a pending boarding and send its confirmation SMS." actions={
         <Button variant="secondary" onClick={() => void load()} disabled={loading || busy !== null}>{loading ? "Refreshing..." : "Refresh"}</Button>
       } />
       {error && <div className="cf-rr-message cf-rr-error" role="alert">{error}</div>}
@@ -136,9 +164,15 @@ export default function ReservationRequests() {
               </div>
               {r.notes && <div className="cf-rr-notes"><span>Care instructions</span><p>{r.notes}</p></div>}
               <div className="cf-rr-card-footer"><small>Submitted {dateTime(r.created_at)}</small>
-                {r.status === "pending_payment" && <div className="cf-feature-actions cf-rr-actions">
-                  <Button disabled={busy !== null} onClick={() => void decide(r, "confirmed")}>{busy === r.id ? "Processing..." : "Confirm Request"}</Button>
-                  <Button variant="secondary" disabled={busy !== null} onClick={() => void decide(r, "declined")}>Decline</Button>
+                {(r.status === "pending_payment" || (r.status === "confirmed" && !r.boarding_booking_id)) && <div className="cf-feature-actions cf-rr-actions">
+                  <Button disabled={busy !== null} onClick={() => void pay(r)}>{busy === r.id ? "Processing..." : "Paid — Create Boarding"}</Button>
+                  {r.status === "pending_payment" && <Button variant="secondary" disabled={busy !== null} onClick={() => void decide(r, "declined")}>Decline</Button>}
+                </div>}
+                {r.status === "confirmed" && r.boarding_booking_id && <div className="cf-rr-paid-actions">
+                  <Link className="cf-rr-boarding-link" to={`/boardings?q=${encodeURIComponent(r.pet_name || "")}`}>View in Boarding List</Link>
+                  <span className={`cf-rr-sms cf-rr-sms-${r.paid_sms_status || "not_sent"}`}>SMS: {r.paid_sms_status || "not sent"}</span>
+                  {r.paid_sms_status !== "queued" && <Button variant="secondary" disabled={busy !== null} onClick={() => void pay(r, "retry_sms")}>{busy === r.id ? "Sending..." : "Retry SMS"}</Button>}
+                  {r.paid_sms_error && <small className="cf-rr-sms-error">{r.paid_sms_error}</small>}
                 </div>}
               </div>
             </article>)}

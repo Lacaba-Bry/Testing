@@ -59,7 +59,7 @@ export default function FeedingSchedule() {
       <PageHeader
         eyebrow="Care & Feeding"
         title="Feeding Schedule"
-        description="A focused timeline of upcoming and completed feedings for boarded pets."
+        description="Manual meals require staff confirmation. Automatic meals update from the feeder’s execution acknowledgment."
         actions={<Button variant="secondary" onClick={refetchSchedules}><ArrowClockwise size={18} /> Refresh</Button>}
       />
 
@@ -99,6 +99,7 @@ export default function FeedingSchedule() {
                 {items.map((item) => {
                   const pet = item.booking?.pet;
                   const room = item.booking?.room;
+                  const isAutomatic = item.feeding_method === "automatic";
                   return (
                     <article key={item.id} className={`feeding-row ${item.status === "pending" && new Date(item.scheduled_at) < new Date() ? "feeding-row--overdue" : ""}`}>
                       <div className="feeding-row__time"><strong>{formatTime(item.scheduled_at)}</strong><span>{item.feeding_method === "automatic" ? "Auto" : "Manual"}</span>{item.status === "pending" && new Date(item.scheduled_at) < new Date() && <small>Late by {Math.max(1,Math.floor((Date.now()-new Date(item.scheduled_at).getTime())/60000))} min</small>}</div>
@@ -107,7 +108,13 @@ export default function FeedingSchedule() {
                         <p>{room?.room_number ? `Room ${room.room_number}` : "Room not assigned"}{item.portion_grams ? ` • ${item.portion_grams} g` : ""}{item.compartment_number ? ` • Compartment ${item.compartment_number}` : ""}</p>
                         {item.instructions && <small>{item.instructions}</small>}
                       </div>
-                      {(item.status === "pending" || item.status === "completed") && (
+                      {isAutomatic && item.status === "pending" && (
+                        <span className="feeding-auto-note" title="The device updates this status after its motor command finishes">Awaiting feeder</span>
+                      )}
+                      {isAutomatic && item.status === "completed" && (
+                        <span className="feeding-auto-note feeding-auto-note--done" title="Motor execution acknowledged, not confirmation of food consumption">Motor confirmed</span>
+                      )}
+                      {!isAutomatic && (item.status === "pending" || item.status === "completed") && (
                         <Button variant={item.status === "completed" ? "secondary" : "primary"} size="sm" disabled={updatingId === item.id} onClick={() => toggleFeedingStatus(item.id, item.status)}>
                           <CheckCircle size={16} />{updatingId === item.id ? "Saving…" : item.status === "completed" ? "Reopen" : "Complete"}
                         </Button>

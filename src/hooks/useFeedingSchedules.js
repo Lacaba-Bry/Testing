@@ -10,6 +10,12 @@ export default function useFeedingSchedules(selectedDate = null) {
 
   const refetchSchedules = useCallback(() => setRefreshKey((value) => value + 1), []);
 
+  // Show hardware-confirmed automatic feeding results without staff clicking Refresh.
+  useEffect(() => {
+    const id = setInterval(() => setRefreshKey((value) => value + 1), 15000);
+    return () => clearInterval(id);
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
 
@@ -63,6 +69,13 @@ export default function useFeedingSchedules(selectedDate = null) {
   }, [selectedDate, refreshKey]);
 
   const toggleFeedingStatus = useCallback(async (scheduleId, currentStatus) => {
+    // UI and DB both reject manual completion of automatic schedules.
+    const existing = schedules.find((item) => item.id === scheduleId);
+    if (!existing || existing.feeding_method !== "manual") {
+      const issue = new Error("Automatic feeding results are updated by the feeder, not by staff.");
+      setError(issue.message);
+      throw issue;
+    }
     const nextStatus = currentStatus === "completed" ? "pending" : "completed";
     setUpdatingId(scheduleId);
     setError("");
@@ -85,7 +98,7 @@ export default function useFeedingSchedules(selectedDate = null) {
     } finally {
       setUpdatingId(null);
     }
-  }, []);
+  }, [schedules]);
 
   return { schedules, loading, updatingId, error, toggleFeedingStatus, refetchSchedules };
 }
