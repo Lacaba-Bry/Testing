@@ -70,9 +70,12 @@ export default function Boardings() {
   async function performBoardingAction(booking, action) {
     if (actionBookingId) return;
     const isCheckIn = action === "check_in";
+    const isEarlyCheckout = action === "check_out";
     const prompt = isCheckIn
       ? `Confirm that ${booking.pet?.name || "the pet"} has physically arrived? Check-in will start now and adjust the stay dates.`
-      : `Cancel booking ${booking.booking_code || ""}? This expires its boarding access.`;
+      : isEarlyCheckout
+        ? `Confirm early checkout for ${booking.pet?.name || "this pet"}? This will mark the boarding as checked out now and expire its booking access. This action cannot be undone from this screen.`
+        : `Cancel booking ${booking.booking_code || ""}? This expires its boarding access.`;
     if (!window.confirm(prompt)) return;
     setActionBookingId(booking.id);
     setActionError("");
@@ -84,7 +87,13 @@ export default function Boardings() {
         p_action: action,
       });
       if (actionFail) throw actionFail;
-      setActionSuccess(isCheckIn ? "Pet checked in successfully." : "Booking cancelled successfully.");
+      setActionSuccess(
+        isCheckIn
+          ? "Pet checked in successfully."
+          : isEarlyCheckout
+            ? "Pet checked out early. Boarding access has been expired."
+            : "Booking cancelled successfully.",
+      );
       await refresh();
     } catch (failure) {
       setActionError(failure?.message || "Could not update boarding.");
@@ -289,7 +298,7 @@ export default function Boardings() {
                     </td>
                     <td>{item.room?.room_number ? `R-${item.room.room_number}` : "—"}</td>
                     <td>{formatDateTime(item.check_in_at)}</td>
-                    <td>{formatDateTime(item.expected_check_out_at)}</td>
+                    <td>{formatDateTime(item.actual_check_out_at || item.expected_check_out_at)}</td>
                     <td>
                       <Badge tone={toneForStatus(item.status)}>{formatStatus(item.status)}</Badge>
                     </td>
@@ -298,6 +307,17 @@ export default function Boardings() {
                         <div className="boarding-row-actions">
                           <Button size="sm" disabled={Boolean(actionBookingId)} onClick={() => performBoardingAction(item, "check_in")}>Check In</Button>
                           <Button size="sm" variant="secondary" disabled={Boolean(actionBookingId)} onClick={() => performBoardingAction(item, "cancel")}>Cancel</Button>
+                        </div>
+                      ) : item.status === "checked_in" && (isAdmin || profile?.role === "staff") ? (
+                        <div className="boarding-row-actions">
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            disabled={Boolean(actionBookingId)}
+                            onClick={() => performBoardingAction(item, "check_out")}
+                          >
+                            Check Out Early
+                          </Button>
                         </div>
                       ) : <span aria-label="No actions available">—</span>}
                     </td>
@@ -318,12 +338,24 @@ export default function Boardings() {
                   {item.owner?.full_name || "No owner"} · {item.room?.room_number ? `R-${item.room.room_number}` : "No room"}
                 </p>
                 <p>
-                  {formatDateTime(item.check_in_at)} – {formatDateTime(item.expected_check_out_at)}
+                  {formatDateTime(item.check_in_at)} – {formatDateTime(item.actual_check_out_at || item.expected_check_out_at)}
                 </p>
                 {item.status === "pending" && isAdmin && (
                   <div className="boarding-row-actions">
                     <Button size="sm" disabled={Boolean(actionBookingId)} onClick={() => performBoardingAction(item, "check_in")}>Check In</Button>
                     <Button size="sm" variant="secondary" disabled={Boolean(actionBookingId)} onClick={() => performBoardingAction(item, "cancel")}>Cancel</Button>
+                  </div>
+                )}
+                {item.status === "checked_in" && (isAdmin || profile?.role === "staff") && (
+                  <div className="boarding-row-actions">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      disabled={Boolean(actionBookingId)}
+                      onClick={() => performBoardingAction(item, "check_out")}
+                    >
+                      Check Out Early
+                    </Button>
                   </div>
                 )}
               </article>

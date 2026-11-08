@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { supabase } from "../services/supabaseClient";
 import PageHeader from "../components/common/PageHeader";
 import Button from "../components/common/Button";
@@ -25,10 +25,12 @@ const money = (value) => value === null || value === undefined || value === "" |
   : new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" }).format(Number(value));
 
 export default function ReservationRequests() {
+  const [searchParams] = useSearchParams();
+  const requestedFilter = FILTERS.some(([value]) => value === searchParams.get("status")) ? searchParams.get("status") : "pending_payment";
   const [items, setItems] = useState([]);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
-  const [filter, setFilter] = useState("pending_payment");
+  const [filter, setFilter] = useState(requestedFilter);
   const [query, setQuery] = useState("");
   const [busy, setBusy] = useState(null);
   const [loading, setLoading] = useState(false);

@@ -103,79 +103,86 @@ export default function useCreateBooking() {
 
 function validateBookingData(formData) {
   if (!formData) {
-    throw new Error(
-      "Booking information is missing.",
-    );
+    throw new Error("Booking information is missing.");
   }
 
-  const checkIn = new Date(
-    formData.checkIn,
-  );
+  // Validate date/time inputs in the same fixed operating timezone used by
+  // the Edge Function. This avoids browser/device timezone differences.
+  const checkIn = parseCareFurDateTime(formData.checkIn);
+  const checkOut = parseCareFurDateTime(formData.checkOut);
 
-  const checkOut = new Date(
-    formData.checkOut,
-  );
-
-  if (
-    !formData.checkIn ||
-    Number.isNaN(checkIn.getTime())
-  ) {
-    throw new Error(
-      "Select a valid check-in date.",
-    );
+  if (!formData.checkIn || !Number.isFinite(checkIn)) {
+    throw new Error("Select a valid check-in date.");
   }
 
-  if (
-    !formData.checkOut ||
-    Number.isNaN(checkOut.getTime())
-  ) {
-    throw new Error(
-      "Select a valid check-out date.",
-    );
+  if (!formData.checkOut || !Number.isFinite(checkOut)) {
+    throw new Error("Select a valid check-out date.");
   }
 
   if (checkOut <= checkIn) {
-    throw new Error(
-      "Check-out must be after check-in.",
-    );
+    throw new Error("Check-out must be after check-in.");
   }
 
   if (!formData.roomId) {
-    throw new Error(
-      "Select a boarding room.",
-    );
+    throw new Error("Select a boarding room.");
   }
 
-  const hasExistingPet =
-    Boolean(formData.petId);
-
-  const hasNewPet =
-    Boolean(formData.newCustomer?.pet);
+  const hasExistingPet = Boolean(formData.petId);
+  const hasNewPet = Boolean(formData.newCustomer?.pet);
 
   if (!hasExistingPet && !hasNewPet) {
-    throw new Error(
-      "Select an existing pet or enter a new pet.",
-    );
+    throw new Error("Select an existing pet or enter a new pet.");
   }
 
-  if (
-    hasExistingPet &&
-    hasNewPet
-  ) {
-    throw new Error(
-      "Choose either an existing pet or a new pet, not both.",
-    );
+  if (hasExistingPet && hasNewPet) {
+    throw new Error("Choose either an existing pet or a new pet, not both.");
   }
 
   if (hasNewPet) {
-    validateNewCustomer(
-      formData.newCustomer,
+    validateNewCustomer(formData.newCustomer);
+  }
+
+  validateFeeding(formData.feeding);
+}
+
+/**
+ * Converts booking form values to comparable epoch milliseconds.
+ * - YYYY-MM-DD means midnight Asia/Manila.
+ * - YYYY-MM-DDTHH:mm (datetime-local) means Asia/Manila wall time.
+ * - ISO strings with Z/offset retain their represented instant.
+ */
+function parseCareFurDateTime(value) {
+  if (typeof value !== "string" || !value.trim()) return NaN;
+
+  const normalized = value.trim();
+  const localMatch = normalized.match(
+    /^(\d{4})-(\d{2})-(\d{2})(?:[T ]([01]\d|2[0-3]):([0-5]\d)(?::([0-5]\d)(?:\.(\d{1,3}))?)?)?$/,
+  );
+
+  if (localMatch) {
+    const [, year, month, day, hour = "00", minute = "00", second = "00", fraction = "0"] = localMatch;
+    const calendar = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
+
+    if (
+      calendar.getUTCFullYear() !== Number(year) ||
+      calendar.getUTCMonth() !== Number(month) - 1 ||
+      calendar.getUTCDate() !== Number(day)
+    ) {
+      return NaN;
+    }
+
+    // Manila is UTC+08:00 year-round. Construct an explicit-offset ISO value
+    // so the browser's local timezone cannot change the validation result.
+    const milliseconds = Number(fraction.padEnd(3, "0"));
+    return Date.parse(
+      `${year}-${month}-${day}T${hour}:${minute}:${second}.${String(milliseconds).padStart(3, "0")}+08:00`,
     );
   }
 
-  validateFeeding(
-    formData.feeding,
-  );
+  // Preserve only explicit-timezone timestamps as absolute instants.
+  if (!/(?:Z|[+-]\d{2}:?\d{2})$/i.test(normalized)) return NaN;
+  const parsed = Date.parse(normalized);
+  return Number.isFinite(parsed) ? parsed : NaN;
 }
 
 function validateNewCustomer(newCustomer) {
@@ -373,11 +380,9 @@ function buildBookingPayload(formData) {
         })),
     },
 
-    timeZone:
-      Intl.DateTimeFormat()
-        .resolvedOptions()
-        .timeZone ||
-      "Asia/Manila",
+    // Boarding dates and feeding times follow CareFur's hotel timezone,
+    // regardless of the workstation/browser timezone.
+    timeZone: "Asia/Manila",
   };
 }
 

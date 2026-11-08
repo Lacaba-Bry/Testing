@@ -45,9 +45,20 @@ export default function useFeedingSchedules(selectedDate = null) {
           .order("scheduled_at", { ascending: true });
 
         if (selectedDate) {
-          const start = new Date(`${selectedDate}T00:00:00`);
-          const end = new Date(`${selectedDate}T23:59:59.999`);
-          query = query.gte("scheduled_at", start.toISOString()).lte("scheduled_at", end.toISOString());
+          // selectedDate is a Philippine calendar date (YYYY-MM-DD).
+          // Use explicit +08:00 offsets instead of the browser timezone.
+          const [year, month, day] = selectedDate.split("-").map(Number);
+          const nextDay = new Date(Date.UTC(year, month - 1, day + 1));
+          const nextDateKey = [
+            nextDay.getUTCFullYear(),
+            String(nextDay.getUTCMonth() + 1).padStart(2, "0"),
+            String(nextDay.getUTCDate()).padStart(2, "0"),
+          ].join("-");
+
+          const startUtc = new Date(`${selectedDate}T00:00:00+08:00`).toISOString();
+          const endUtc = new Date(`${nextDateKey}T00:00:00+08:00`).toISOString();
+
+          query = query.gte("scheduled_at", startUtc).lt("scheduled_at", endUtc);
         }
 
         const { data, error: fetchError } = await query;

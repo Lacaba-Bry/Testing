@@ -12,6 +12,7 @@ import Activity from "./pages/Activity";
 import NewBoarding from "./pages/NewBoarding";
 import Boardings from "./pages/Boardings";
 import ReservationRequests from "./pages/ReservationRequests";
+import Extensions from "./pages/Extensions";
 import Pets from "./pages/Pets";
 import Rooms from "./pages/Rooms";
 import FeedingSchedule from "./pages/FeedingSchedule";
@@ -55,6 +56,7 @@ export default function App() {
         <Route path="/boarding/new" element={<NewBoarding />} />
         <Route path="/boardings" element={<Boardings />} />
         <Route path="/reservation-requests" element={<ReservationRequests />} />
+        <Route path="/extensions" element={<Extensions />} />
         <Route path="/pets" element={<Pets />} />
         <Route path="/rooms" element={<Rooms />} />
         <Route path="/feeding-schedules" element={<FeedingSchedule />} />

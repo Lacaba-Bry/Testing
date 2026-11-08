@@ -172,3 +172,46 @@
 /* Staff actions on pending boarding records */
 .boarding-row-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .boarding-row-actions .ui-button { white-space: nowrap; }
+
+/* Boarding record detail drawer/modal */
+.cf-boarding-detail-backdrop{z-index:1200;align-items:flex-start;overflow-y:auto;padding:24px 14px}
+.cf-boarding-detail{width:min(1040px,100%);max-height:none;max-height:calc(100vh - 48px);overflow:auto;padding:0;gap:0;border-radius:18px}
+.cf-boarding-detail__header{position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;gap:18px;padding:22px 24px;background:#fff;border-bottom:1px solid var(--carefur-border)}
+.cf-boarding-detail__header h2{margin:5px 0 3px;color:var(--carefur-green-dark);font-size:1.35rem}
+.cf-boarding-detail__header p{margin:0;color:var(--carefur-muted);font-size:.86rem}
+.cf-detail-eyebrow{font-size:.68rem;letter-spacing:.08em;font-weight:850;color:var(--carefur-accent)}
+.cf-detail-close{width:38px;height:38px;flex:0 0 auto;border:1px solid var(--carefur-border);border-radius:10px;background:#fff;color:var(--carefur-green-dark);display:grid;place-items:center;cursor:pointer}
+.cf-boarding-detail__body{padding:20px 24px 24px;display:grid;gap:20px}
+.cf-detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.cf-detail-card{min-width:0;border:1px solid var(--carefur-border);border-radius:13px;padding:15px;background:#fff}
+.cf-detail-card h3,.cf-detail-section h3{display:flex;align-items:center;gap:8px;margin:0 0 12px;color:var(--carefur-green-dark);font-size:.94rem}
+.cf-detail-card h3 svg,.cf-detail-section h3 svg{color:var(--carefur-accent)}
+.cf-detail-card>div{display:grid;gap:6px;font-size:.84rem;overflow-wrap:anywhere}
+.cf-detail-card>div>strong{color:var(--carefur-text)}
+.cf-detail-card>div>span{color:var(--carefur-muted);line-height:1.45}
+.cf-detail-card a,.cf-detail-section>a{display:inline-flex;margin-top:6px;color:var(--carefur-green);font-size:.82rem;font-weight:800;text-decoration:none}
+.cf-detail-subitem{display:flex;align-items:center;gap:6px;padding-left:8px;font-size:.79rem!important}
+.cf-detail-divider{height:1px;background:var(--carefur-border);margin:5px 0}
+.cf-detail-section{border:1px solid var(--carefur-border);border-radius:13px;padding:16px;background:#fff}
+.cf-detail-section h3{margin-bottom:12px}
+.cf-detail-list{display:grid}
+.cf-detail-row{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:11px 0;border-bottom:1px solid #edf1ee}
+.cf-detail-row:last-child{border-bottom:0}
+.cf-detail-row>div{display:grid;gap:3px;min-width:0}
+.cf-detail-row strong{font-size:.85rem}
+.cf-detail-row span,.cf-detail-row small{font-size:.79rem;color:var(--carefur-muted);overflow-wrap:anywhere}
+.cf-detail-status{flex:0 0 auto;padding:4px 8px;border-radius:20px;background:#eef2ef;color:#52615b!important;font-weight:800;text-transform:capitalize}
+.cf-detail-status.status-approved,.cf-detail-status.status-completed,.cf-detail-status.status-success{background:#e7f5eb;color:#167044!important}
+.cf-detail-status.status-pending{background:#fff4d9;color:#8a5b00!important}
+.cf-detail-status.status-declined,.cf-detail-status.status-failed,.cf-detail-status.status-missed{background:#fdebed;color:#a52d39!important}
+.cf-detail-muted{margin:8px 0;color:var(--carefur-muted);font-size:.8rem;line-height:1.5}
+.cf-timeline{display:grid;gap:0;margin-left:5px}
+.cf-timeline-event{position:relative;display:grid;grid-template-columns:14px 1fr;gap:10px;padding:0 0 17px}
+.cf-timeline-event:not(:last-child):before{content:"";position:absolute;left:5px;top:12px;bottom:0;width:2px;background:#dce8e1}
+.cf-timeline-dot{width:12px;height:12px;margin-top:3px;border:3px solid #c7e1d4;border-radius:50%;background:var(--carefur-green);z-index:1}
+.cf-timeline-event>div{display:grid;gap:3px}
+.cf-timeline-event strong{font-size:.84rem;text-transform:capitalize}
+.cf-timeline-event time{font-size:.76rem;color:var(--carefur-accent)}
+.cf-timeline-event p{margin:0;font-size:.8rem;color:var(--carefur-muted);line-height:1.45}
+.cf-detail-footer-actions{display:flex;justify-content:flex-end;gap:9px;flex-wrap:wrap;padding-top:4px}
+@media(max-width:700px){.cf-boarding-detail-backdrop{padding:8px}.cf-boarding-detail{max-height:calc(100vh - 16px)}.cf-boarding-detail__header{padding:17px}.cf-boarding-detail__body{padding:14px;gap:13px}.cf-detail-grid{grid-template-columns:1fr}.cf-detail-row{gap:8px}.cf-detail-footer-actions>*{flex:1}}
