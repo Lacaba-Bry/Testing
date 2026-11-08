@@ -4,7 +4,6 @@ import PageHeader from "../components/common/PageHeader";
 import { supabase } from "../services/supabaseClient";
 import "./MotorTest.css";
 import FeederFoodMonitor from "../components/FeederFoodMonitor";
-import FeederScheduleTester from "../components/FeederScheduleTester";
 import FeederRTCSettings from "../components/FeederRTCSettings";
 
 async function invoke(body) {
@@ -89,6 +88,5 @@ export default function MotorTest() {
     </div>
     {selectedFeeder && <FeederFoodMonitor deviceCode={selectedFeeder.device_code} />}
     {selectedFeeder && <FeederRTCSettings deviceId={selectedFeeder.id} />}
-    {selectedFeeder && <FeederScheduleTester deviceId={selectedFeeder.id} />}
   </section>;
 }

@@ -7,3 +7,7 @@
 .cf-group-pet { display:flex; align-items:center; gap:7px; font-size:14px; }
 .feeding-row--overdue { border-left:4px solid var(--carefur-accent); padding-left:12px; }
 .feeding-row__time small { display:block; color:#8b4f00; font-size:13px; }
+
+/* Automatic feed status: informational, never a manual completion button. */
+.feeding-auto-note { display:inline-flex; align-items:center; padding:7px 11px; border-radius:10px; border:1px solid var(--border-color, #d4d8df); font-size:12px; font-weight:600; color:var(--text-secondary, #5b6473); white-space:nowrap; }
+.feeding-auto-note--done { color:#20734a; border-color:#b5d9c4; }
