@@ -41,6 +41,7 @@ const groups = [
     items: [
       { label: "Boarding List", to: "/boardings", icon: CalendarCheck },
       { label: "Reservation Requests", to: "/reservation-requests", icon: ClipboardText },
+      { label: "Extension Requests", to: "/extensions", icon: CalendarPlus },
       { label: "Rooms", to: "/rooms", icon: House },
       { label: "Pets", to: "/pets", icon: PawPrint },
     ],

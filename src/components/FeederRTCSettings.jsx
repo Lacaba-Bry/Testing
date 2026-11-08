@@ -81,7 +81,9 @@ export default function FeederRTCSettings({ deviceId }) {
     }
   }
 
-  const acknowledged = form.version > 0 && form.cached_version === form.version;
+  const acknowledged = form.version > 0 &&
+    Number(form.cached_version) === Number(form.version) && !!form.cached_at;
+  const leaseExpired = !!form.lease_expires_at && new Date(form.lease_expires_at).getTime() <= Date.now();
   const lease = form.lease_expires_at ? new Date(form.lease_expires_at).toLocaleString() : "None";
 
   return (
@@ -120,9 +122,10 @@ export default function FeederRTCSettings({ deviceId }) {
       </form>
       <p className="feeder-schedule-meta">
         Cloud version: <strong>{form.version || 0}</strong>. ESP32 cache version: <strong>{form.cached_version ?? "Not acknowledged"}</strong>.
-        {acknowledged ? " Device confirmed latest configuration." : " Wait for ESP32 connection and acknowledgment."}
+        {acknowledged ? " Device confirmed latest configuration." : " Not yet acknowledged by ESP32; keep its previous mode in mind."}
       </p>
-      <p className="feeder-schedule-meta">Lease expires: <strong>{lease}</strong>. RTC is <strong>{form.enabled ? "enabled" : "disabled"}</strong>.</p>
+      <p className="feeder-schedule-meta">Lease expires: <strong>{lease}</strong>. RTC cloud configuration is <strong>{form.enabled ? "enabled" : "disabled"}</strong>.
+        {leaseExpired && form.enabled ? " Authorization has expired; investigate ESP32 sync before using cloud mode." : ""}</p>
       <p className="feeder-schedule-info">
         When enabling, confirm physical position/homing and supervise the first rotation.
         Offline cancellation cannot reach a disconnected ESP32 immediately: it stops at lease expiry.

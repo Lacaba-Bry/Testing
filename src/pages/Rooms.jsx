@@ -1,5 +1,6 @@
 import { ArrowClockwise, House, Wrench, Camera, Robot } from "@phosphor-icons/react";
 import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import Badge from "../components/common/Badge";
 import Button from "../components/common/Button";
 import EmptyState from "../components/common/EmptyState";
@@ -21,8 +22,10 @@ const reasons = ["Cleaning", "Repair", "Equipment issue", "Closed"];
 
 export default function Rooms() {
   const { rooms, loading, error, refetchRooms, setRoomStatus } = useRooms();
+  const [searchParams] = useSearchParams();
+  const requestedRoomFilter = filters.some((item) => item.key === searchParams.get("status")) ? searchParams.get("status") : "all";
   const { isAdmin } = useAuth();
-  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterStatus, setFilterStatus] = useState(requestedRoomFilter);
   const [message, setMessage] = useState("");
   const [manageOpen, setManageOpen] = useState(false);
   const [selectedRoomId, setSelectedRoomId] = useState("");

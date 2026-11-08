@@ -13,6 +13,7 @@ const dateLabel = new Intl.DateTimeFormat("en-PH", { weekday: "short", month: "s
 
 export default function Dashboard() {
   const { profile } = useAuth();
+  const feederReviewPath = profile?.role === "admin" ? "/smart-units" : "/feeding-schedules";
   const data = useDashboard();
   const {
     arrivals,

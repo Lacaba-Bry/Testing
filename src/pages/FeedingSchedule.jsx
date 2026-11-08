@@ -1,5 +1,6 @@
 import { ArrowClockwise, CalendarBlank, CheckCircle, Clock, ForkKnife, WarningCircle } from "@phosphor-icons/react";
 import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import Badge from "../components/common/Badge";
 import Button from "../components/common/Button";
 import EmptyState from "../components/common/EmptyState";
@@ -10,7 +11,9 @@ import "./FeedingSchedule.css";
 const views = ["today", "overdue", "next7", "completed", "all"];
 
 export default function FeedingSchedule() {
-  const [view, setView] = useState("today");
+  const [searchParams] = useSearchParams();
+  const initialView = views.includes(searchParams.get("view")) ? searchParams.get("view") : "today";
+  const [view, setView] = useState(initialView);
   const [filterStatus, setFilterStatus] = useState("all");
   const [groupByPet, setGroupByPet] = useState(false);
   const [page, setPage] = useState(1);
