@@ -240,3 +240,45 @@
 }
 
 .sidebar-account{gap:10px;min-height:62px;padding:12px 8px 3px}.sidebar-account__copy{display:flex;flex-direction:column;justify-content:center;gap:1px;min-width:0}.sidebar-account__copy strong{font-size:.88rem;line-height:1.3}.sidebar-account__copy span{font-size:.76rem;line-height:1.3;color:#c1d6d1;text-transform:capitalize}.sidebar-account .sidebar-avatar{flex-shrink:0}
+
+/* Responsive, independently scrolling sidebar. Keeps the account area visible. */
+.sidebar {
+  box-sizing: border-box;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  width: 248px;
+}
+.sidebar-brand, .cf-new-boarding, .sidebar-account { flex-shrink: 0; }
+.sidebar-nav {
+  display: block;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,.35) transparent;
+  padding: 2px 2px 14px;
+}
+.sidebar-link { min-width: 0; width: 100%; box-sizing: border-box; }
+.sidebar-link > svg { flex-shrink: 0; }
+.sidebar-link > span { min-width: 0; overflow-wrap: anywhere; }
+.sidebar-hardware-links { min-width: 0; margin-left: 10px; padding-left: 10px; }
+.sidebar-hardware-child { font-size: .8rem; gap: 8px; }
+.sidebar-account { margin-top: 0; padding-bottom: max(6px, env(safe-area-inset-bottom)); }
+.sidebar-close { cursor: pointer; flex-shrink: 0; }
+@media (max-width: 900px) {
+  .sidebar { width: min(290px, 86vw); max-width: 100%; z-index: 60; }
+}
+@media (max-height: 650px) {
+  .sidebar { padding-top: 7px; padding-bottom: 6px; }
+  .sidebar-brand { padding-bottom: 6px; }
+  .sidebar-group-title { margin-top: 8px; }
+  .sidebar-link { min-height: 35px; }
+  .cf-new-boarding { min-height: 38px; margin-bottom: 6px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sidebar { transition: none; }
+}

@@ -7,7 +7,7 @@ import {CAMERA_GATEWAY_URL,checkCameraGateway} from "../services/cameraGateway";
 import "./HardwareSetup.css";
 import "./FeederWiFiManager.css";
 
-const PORTAL="http://192.168.9.1:8080/";
+const PORTAL="http://192.168.8.1:8080/";
 function age(iso){if(!iso)return "Never";const n=Math.max(0,Math.round((Date.now()-Date.parse(iso))/1000));return Number.isFinite(n)?`${n}s ago`:"Unknown";}
 export default function HardwareSetup(){
   const [data,setData]=useState(null),[onlineFromServer,setOnline]=useState(false);
@@ -76,7 +76,7 @@ export default function HardwareSetup(){
       <div className="hardware-actions"><a className="hardware-primary hardware-link" href="http://192.168.4.1/" target="_blank" rel="noopener noreferrer">Open feeder shared setup <ArrowSquareOut size={17}/></a><Link className="hardware-secondary hardware-link" to="/feeder-wifi-manager">Feeder Wi-Fi Manager</Link></div>
     </div>
     <div className="hardware-panel"><h2>Add new Wi-Fi locally</h2><p>When the camera is offline or needs an unknown network, a nearby phone joins <strong>CareFur-Camera-Setup</strong> and opens the local setup portal. Your public dashboard cannot reach a device with no internet connection.</p>
-      <div className="hardware-actions"><a className="hardware-primary hardware-link" href={PORTAL} target="_blank" rel="noopener noreferrer">Open local setup <ArrowSquareOut size={17}/></a><a className="hardware-secondary hardware-link" href="http://192.168.9.1:8080/scan" target="_blank" rel="noopener noreferrer">Scan locally <ArrowSquareOut size={17}/></a></div>
+      <div className="hardware-actions"><a className="hardware-primary hardware-link" href={PORTAL} target="_blank" rel="noopener noreferrer">Open local setup <ArrowSquareOut size={17}/></a><a className="hardware-secondary hardware-link" href="http://192.168.8.1:8080/scan" target="_blank" rel="noopener noreferrer">Scan locally <ArrowSquareOut size={17}/></a></div>
     </div>
     <div className="hardware-panel"><h2>Camera gateway test</h2><p className="hardware-endpoint">{CAMERA_GATEWAY_URL}/health</p>
       <div className="hardware-actions"><button className="hardware-primary" onClick={testCamera} disabled={testing}><ArrowClockwise size={18}/>{testing?"Testing…":"Test camera gateway"}</button><Link className="hardware-secondary hardware-link" to="/camera-test">Camera Test <ArrowSquareOut size={17}/></Link></div>

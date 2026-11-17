@@ -20,7 +20,7 @@ import {
   ChatsCircle,
 } from "@phosphor-icons/react";
 import { NavLink, useLocation, Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import logo from "../../assets/logos/snuggles_logo.png";
 import useAuth from "../../hooks/useAuth";
 import "./Sidebar.css";
@@ -62,7 +62,6 @@ const groups = [
 const hardwareItems = [
   { label: "Smart Units", to: "/smart-units", icon: Cube },
   { label: "Connection Manual", to: "/connection-manual", icon: BookOpenText },
-  { label: "Camera Wi-Fi", to: "/hardware-setup", icon: WifiHigh },
   { label: "Feeder ESP32", to: "/motor-test", icon: GearSix },
   { label: "Feeder Wi-Fi", to: "/feeder-wifi-manager", icon: WifiHigh },
   { label: "Camera Test", to: "/camera-test", icon: Camera },
@@ -72,10 +71,13 @@ export default function Sidebar({ isOpen, onClose }) {
   const location = useLocation();
   const hardwareIsActive = hardwareItems.some((item) => item.to === location.pathname);
   const [expanded, setExpanded] = useState(hardwareIsActive);
+  useEffect(() => {
+    if (hardwareIsActive) setExpanded(true);
+  }, [hardwareIsActive]);
   const { logout, profile, isAdmin } = useAuth();
 
   return (
-    <aside className={`sidebar ${isOpen ? "sidebar-open" : ""}`}>
+    <aside id="carefur-sidebar" className={`sidebar ${isOpen ? "sidebar-open" : ""}`} aria-label="Sidebar navigation">
       <div className="sidebar-brand">
         <img src={logo} alt="CareFur" className="sidebar-brand__logo" />
         <div className="sidebar-brand__copy">
